@@ -1,0 +1,5 @@
+src/shared/api/schema.d.ts
+.next
+node_modules
+*.lock
+package-lock.json

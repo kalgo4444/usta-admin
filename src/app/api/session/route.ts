@@ -1,0 +1,53 @@
+import type { NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
+import {
+	backendFetch,
+	clearRefreshCookie,
+	gatewayError,
+	passthrough,
+	readRefreshCookie,
+	revokeRefreshToken,
+	toSessionPayload,
+	writeRefreshCookie,
+} from '@/shared/api/backend.server';
+import type { TokenResponse } from '@/shared/api/types';
+
+/** Login: verify OTP, require ADMIN role, store refresh token in an httpOnly cookie. */
+export async function POST(req: NextRequest) {
+	const lang = req.headers.get('accept-language');
+	let res: Response;
+	try {
+		res = await backendFetch('/auth/otp/verify', {
+			method: 'POST',
+			lang,
+			headers: { 'content-type': 'application/json' },
+			body: await req.text(),
+		});
+	} catch (e) {
+		return gatewayError(e);
+	}
+	if (!res.ok) return passthrough(res);
+
+	const tokens = (await res.json()) as TokenResponse;
+	const user = tokens.user;
+	const isAdmin = user?.roles?.includes('ADMIN');
+	if (!isAdmin || user?.status === 'BLOCKED') {
+		if (tokens.refreshToken) await revokeRefreshToken(tokens.refreshToken, lang);
+		const code = isAdmin ? 'USER_BLOCKED' : 'NOT_ADMIN';
+		return NextResponse.json(
+			{ status: 403, code, detail: code },
+			{ status: 403, headers: { 'content-type': 'application/problem+json' } },
+		);
+	}
+
+	await writeRefreshCookie(tokens);
+	return NextResponse.json(toSessionPayload(tokens));
+}
+
+/** Logout: revoke refresh token on the backend and drop the cookie. */
+export async function DELETE(req: NextRequest) {
+	const rt = await readRefreshCookie();
+	if (rt) await revokeRefreshToken(rt, req.headers.get('accept-language'));
+	await clearRefreshCookie();
+	return new NextResponse(null, { status: 204 });
+}
