@@ -3,6 +3,7 @@ import {
 	backendFetch,
 	clearRefreshCookie,
 	gatewayError,
+	problem,
 	readRefreshCookie,
 	revokeRefreshToken,
 	toSessionPayload,
@@ -16,7 +17,7 @@ import type { TokenResponse } from '@/shared/api/types';
  */
 export async function POST() {
 	const rt = await readRefreshCookie();
-	if (!rt) return NextResponse.json({ status: 401, code: 'NO_SESSION' }, { status: 401 });
+	if (!rt) return problem(401, 'NO_SESSION');
 
 	let res: Response;
 	try {
@@ -30,17 +31,17 @@ export async function POST() {
 		return gatewayError(e);
 	}
 
-	if (res.status >= 500) return NextResponse.json({ status: res.status }, { status: 502 });
+	if (res.status >= 500) return problem(502, 'UPSTREAM_ERROR', `Backend responded ${res.status}`);
 	if (!res.ok) {
 		await clearRefreshCookie();
-		return NextResponse.json({ status: 401, code: 'SESSION_EXPIRED' }, { status: 401 });
+		return problem(401, 'SESSION_EXPIRED');
 	}
 
 	const tokens = (await res.json()) as TokenResponse;
 	if (!tokens.user?.roles?.includes('ADMIN') || tokens.user.status === 'BLOCKED') {
 		if (tokens.refreshToken) await revokeRefreshToken(tokens.refreshToken);
 		await clearRefreshCookie();
-		return NextResponse.json({ status: 403, code: 'NOT_ADMIN' }, { status: 403 });
+		return problem(403, 'NOT_ADMIN');
 	}
 
 	await writeRefreshCookie(tokens);

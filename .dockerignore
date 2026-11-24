@@ -1,0 +1,15 @@
+node_modules
+.next
+.git
+.claude
+.playwright-mcp
+.env
+.env.*
+!.env.example
+audits
+docs
+*.log
+.DS_Store
+tsconfig.tsbuildinfo
+Dockerfile
+docker-compose.yml

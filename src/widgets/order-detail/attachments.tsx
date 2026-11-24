@@ -3,6 +3,7 @@
 import { FileIcon, PlayIcon } from 'lucide-react';
 import type { Attachment } from '@/shared/api/types';
 import { formatBytes } from '@/shared/lib/format';
+import { ExternalLink } from '@/shared/ui/external-link';
 
 export function Attachments({ items }: { items: Attachment[] }) {
 	return (
@@ -12,11 +13,9 @@ export function Attachments({ items }: { items: Attachment[] }) {
 				const image = type.startsWith('image') || type === 'PHOTO' || type === 'IMAGE';
 				const video = type.startsWith('video') || type === 'VIDEO';
 				return (
-					<a
+					<ExternalLink
 						key={a.id}
 						href={a.url}
-						target='_blank'
-						rel='noopener noreferrer'
 						className='group relative aspect-square overflow-hidden rounded-lg border border-border bg-muted'
 					>
 						{image ? (
@@ -37,7 +36,7 @@ export function Attachments({ items }: { items: Attachment[] }) {
 								{formatBytes(a.sizeBytes)}
 							</span>
 						)}
-					</a>
+					</ExternalLink>
 				);
 			})}
 		</div>

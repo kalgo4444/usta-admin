@@ -7,6 +7,50 @@ import type { TokenResponse } from './types';
 
 const TIMEOUT_MS = 65_000;
 
+/** The admin UI only sends JSON; anything bigger is rejected before buffering. */
+export const MAX_BODY_BYTES = 1024 * 1024;
+
+/** RFC 9457 problem+json response, the same shape the backend uses (`status`, `code`, `detail`). */
+export function problem(status: number, code: string, detail?: string) {
+	return NextResponse.json(
+		{ status, code, detail: detail ?? code },
+		{ status, headers: { 'content-type': 'application/problem+json' } },
+	);
+}
+
+/**
+ * Read the request body with a byte cap (Content-Length is checked first, then the stream
+ * is counted so chunked bodies can't bypass it). Returns a problem response instead of the
+ * body when the cap is exceeded or the stream fails (e.g. the client aborted).
+ */
+export async function readBodyLimited(
+	req: Request,
+	max = MAX_BODY_BYTES,
+): Promise<Uint8Array<ArrayBuffer> | NextResponse> {
+	const tooLarge = () => problem(413, 'PAYLOAD_TOO_LARGE', 'Request body is too large');
+	if (Number(req.headers.get('content-length')) > max) return tooLarge();
+	if (!req.body) return new Uint8Array(0);
+
+	const reader = req.body.getReader();
+	const chunks: Uint8Array[] = [];
+	let size = 0;
+	try {
+		for (;;) {
+			const { done, value } = await reader.read();
+			if (done) break;
+			size += value.byteLength;
+			if (size > max) {
+				await reader.cancel();
+				return tooLarge();
+			}
+			chunks.push(value);
+		}
+	} catch {
+		return problem(400, 'BAD_REQUEST_BODY', 'Request body could not be read');
+	}
+	return new Uint8Array(Buffer.concat(chunks));
+}
+
 /** Server → backend call. No Origin header is sent, so backend CORS rules don't apply. */
 export async function backendFetch(
 	path: string,
@@ -27,14 +71,9 @@ export async function backendFetch(
 export function gatewayError(e: unknown) {
 	const timeout =
 		e instanceof DOMException && (e.name === 'TimeoutError' || e.name === 'AbortError');
-	return NextResponse.json(
-		{
-			status: timeout ? 504 : 502,
-			code: timeout ? 'UPSTREAM_TIMEOUT' : 'UPSTREAM_UNREACHABLE',
-			detail: timeout ? 'Backend did not respond in time' : 'Backend is unreachable',
-		},
-		{ status: timeout ? 504 : 502, headers: { 'content-type': 'application/problem+json' } },
-	);
+	return timeout
+		? problem(504, 'UPSTREAM_TIMEOUT', 'Backend did not respond in time')
+		: problem(502, 'UPSTREAM_UNREACHABLE', 'Backend is unreachable');
 }
 
 /** Pass a backend response through unchanged (status, content-type, body). */

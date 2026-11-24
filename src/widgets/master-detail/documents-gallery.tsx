@@ -8,6 +8,7 @@ import { useEnumLabel } from '@/shared/i18n/use-enum';
 import { formatBytes, formatDate } from '@/shared/lib/format';
 import { Button } from '@/shared/ui/kit/button';
 import { Dialog, DialogContent, DialogTitle } from '@/shared/ui/kit/dialog';
+import { ExternalLink } from '@/shared/ui/external-link';
 
 const ORDER: DocumentType[] = ['PASSPORT', 'SELFIE', 'CERTIFICATE', 'OTHER'];
 const isImage = (d: { contentType?: string }) => d.contentType?.startsWith('image/');
@@ -51,11 +52,9 @@ export function DocumentsGallery({ documents }: { documents: MasterDocument[] })
 										/>
 									</button>
 								) : (
-									<a
+									<ExternalLink
 										key={d.id}
 										href={d.url}
-										target='_blank'
-										rel='noopener noreferrer'
 										className='flex aspect-[4/3] flex-col items-center justify-center gap-2 rounded-lg border border-border bg-muted p-3 text-center text-sm hover:bg-secondary'
 									>
 										<FileTextIcon className='size-7 text-muted-foreground' />
@@ -63,7 +62,7 @@ export function DocumentsGallery({ documents }: { documents: MasterDocument[] })
 										<span className='num text-xs text-muted-foreground'>
 											{formatBytes(d.sizeBytes)}
 										</span>
-									</a>
+									</ExternalLink>
 								),
 							)}
 						</div>
