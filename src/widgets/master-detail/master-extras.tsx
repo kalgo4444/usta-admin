@@ -8,6 +8,7 @@ import { Button } from '@/shared/ui/kit/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/kit/card';
 import { Skeleton } from '@/shared/ui/kit/skeleton';
 import { ErrorState } from '@/shared/ui/error-state';
+import { ExternalLink } from '@/shared/ui/external-link';
 
 export function MasterServices({ id }: { id: string }) {
 	const t = useTranslations('masters');
@@ -67,11 +68,9 @@ export function MasterPortfolio({ id }: { id: string }) {
 				) : (
 					<div className='grid grid-cols-3 gap-2'>
 						{q.data.map(p => (
-							<a
+							<ExternalLink
 								key={p.id}
 								href={p.url}
-								target='_blank'
-								rel='noopener noreferrer'
 								title={p.description}
 								className='aspect-square overflow-hidden rounded-md border border-border bg-muted'
 							>
@@ -83,7 +82,7 @@ export function MasterPortfolio({ id }: { id: string }) {
 										{p.contentType}
 									</span>
 								)}
-							</a>
+							</ExternalLink>
 						))}
 					</div>
 				)}

@@ -1,6 +1,11 @@
 import type { NextRequest } from 'next/server';
-import { NextResponse } from 'next/server';
-import { backendFetch, gatewayError, passthrough } from '@/shared/api/backend.server';
+import {
+	backendFetch,
+	gatewayError,
+	passthrough,
+	problem,
+	readBodyLimited,
+} from '@/shared/api/backend.server';
 
 /**
  * Same-origin proxy for /api/v1/* → backend. The backend rejects browser CORS preflights,
@@ -14,9 +19,14 @@ const FORWARD_HEADERS = ['authorization', 'content-type', 'accept-language'];
 
 async function handler(req: NextRequest, ctx: RouteContext<'/api/v1/[...path]'>) {
 	const { path } = await ctx.params;
+	// Reject dot-segments / separators: fetch() would normalise `x/../auth/refresh`
+	// after the blocklist check, escaping /api/v1 and the blocklist.
+	if (path.some(s => !s || s === '.' || s === '..' || /[/\\\0]/.test(s))) {
+		return problem(400, 'INVALID_PATH', 'Invalid path');
+	}
 	const joined = path.map(encodeURIComponent).join('/');
-	if (BLOCKED.has(path.join('/'))) {
-		return NextResponse.json({ status: 404, detail: 'Use /api/session' }, { status: 404 });
+	if (BLOCKED.has(path.join('/').toLowerCase())) {
+		return problem(404, 'NOT_FOUND', 'Use /api/session');
 	}
 
 	const headers = new Headers();
@@ -26,11 +36,13 @@ async function handler(req: NextRequest, ctx: RouteContext<'/api/v1/[...path]'>)
 	}
 
 	const hasBody = !['GET', 'HEAD'].includes(req.method);
+	const body = hasBody ? await readBodyLimited(req) : undefined;
+	if (body instanceof Response) return body;
 	try {
 		const res = await backendFetch(`/${joined}${req.nextUrl.search}`, {
 			method: req.method,
 			headers,
-			body: hasBody ? await req.arrayBuffer() : undefined,
+			body,
 		});
 		return passthrough(res);
 	} catch (e) {

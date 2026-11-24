@@ -30,9 +30,17 @@ function useCountdown(until: number | null) {
 }
 
 function safeNext(next: string | null) {
-	return next && next.startsWith('/') && !next.startsWith('//') && !next.startsWith(routes.login)
-		? next
-		: routes.overview;
+	if (!next) return routes.overview;
+	try {
+		const u = new URL(next, window.location.origin);
+		const isLogin = u.pathname === routes.login || u.pathname.startsWith(`${routes.login}/`);
+		if (u.origin !== window.location.origin || isLogin) {
+			return routes.overview;
+		}
+		return u.pathname + u.search + u.hash;
+	} catch {
+		return routes.overview;
+	}
 }
 
 export function LoginForm() {
