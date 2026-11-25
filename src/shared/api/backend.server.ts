@@ -87,6 +87,21 @@ export async function passthrough(res: Response) {
 	return new NextResponse(res.status === 204 ? null : body, { status: res.status, headers });
 }
 
+/** Parse a successful token response; null when the body is not a usable TokenResponse. */
+export async function readTokens(res: Response): Promise<TokenResponse | null> {
+	try {
+		const t = (await res.json()) as TokenResponse;
+		return t?.accessToken && t.user ? t : null;
+	} catch {
+		return null;
+	}
+}
+
+/** Only an ACTIVE user with the ADMIN role may hold an admin session. */
+export function isActiveAdmin(user: TokenResponse['user'] | undefined) {
+	return Boolean(user?.roles?.includes('ADMIN')) && user?.status === 'ACTIVE';
+}
+
 export async function readRefreshCookie() {
 	return (await cookies()).get(REFRESH_COOKIE)?.value;
 }

@@ -13,13 +13,13 @@ npm run format       # prettier (tailwind class sorting)
 npm run gen:api      # regenerate src/shared/api/schema.d.ts from the live /v3/api-docs
 ```
 
+Docker: `docker compose up --build` serves the standalone Next build on `${PORT:-4010}`; `API_URL` is a runtime, server-only env var (empty falls back to the default in `src/shared/config/env.ts`).
+
 There is no test runner configured. npm is the package manager (`package-lock.json`); `bun.lock` is stale.
 
 If `tsc`/`build` fails on `.next/dev/types/validator.ts` referencing deleted routes, delete the stale files in `.next/dev/types/` (the project denies `rm -rf`, so remove the files individually).
 
 ## Architecture
-
-**Backend access goes through a same-origin proxy, never directly.** The backend (`https://usta-platform-nwtz.onrender.com`, Render free tier — 30–60 s cold starts) rejects browser CORS preflights.
 
 - `src/app/api/v1/[...path]/route.ts` proxies all `/api/v1/*` calls; `auth/otp/verify`, `auth/refresh`, `auth/logout` are deliberately blocked there.
 - `src/app/api/session/` (login/logout) and `session/refresh/` handle tokens. The backend **rotates the refresh token on every refresh**, so the refresh token lives only in an httpOnly cookie (`usta_rt`) and the access token only in memory (`src/shared/api/session.ts`).
@@ -48,3 +48,13 @@ If `tsc`/`build` fails on `.next/dev/types/validator.ts` referencing deleted rou
 - `react-hook-form`'s `watch()` breaks the React Compiler lint rule — use `useWatch`. Form dialogs are split so the form component mounts per open (fresh defaults instead of reset effects); avoid reading refs during render.
 - `DataTable` uses `"use no memo"` because the TanStack table instance is mutable.
 - The OTP flow can't be exercised without a real admin phone (`ADMIN_PHONES` on the backend); for UI work, mock `/api/session/refresh` and `/api/v1/**` in the browser with a fake `usta_rt` cookie.
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+## This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->

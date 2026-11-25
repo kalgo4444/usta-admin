@@ -10,10 +10,13 @@ import { sessionStore, type SessionPayload } from '@/shared/api/session';
 import type { OtpChallengeResponse } from '@/shared/api/types';
 import { routes } from '@/shared/config/routes';
 import { localeStore } from '@/shared/i18n/locale';
-import { formatPhone, normalizePhone } from '@/shared/lib/format';
+import { formatPhone } from '@/shared/lib/format';
 import { Button } from '@/shared/ui/kit/button';
 import { Input } from '@/shared/ui/kit/input';
 import { Field } from '@/shared/ui/field';
+
+const DIAL = '998';
+const PHONE_LENGTH = 9;
 
 type Step =
 	| { kind: 'phone' }
@@ -50,7 +53,7 @@ export function LoginForm() {
 	const sp = useSearchParams();
 
 	const [step, setStep] = useState<Step>({ kind: 'phone' });
-	const [phone, setPhone] = useState('+998 ');
+	const [phone, setPhone] = useState('');
 	const [code, setCode] = useState('');
 	const [error, setError] = useState<string | null>(null);
 	const [pending, setPending] = useState(false);
@@ -111,8 +114,8 @@ export function LoginForm() {
 	};
 
 	if (step.kind === 'phone') {
-		const normalized = normalizePhone(phone);
-		const valid = /^\+998\d{9}$/.test(normalized);
+		const normalized = `+${DIAL}${phone}`;
+		const valid = phone.length === PHONE_LENGTH;
 		return (
 			<form
 				className='space-y-6'
@@ -123,18 +126,21 @@ export function LoginForm() {
 				}}
 			>
 				<Field label={t('phone')} htmlFor='phone' error={error ?? undefined}>
-					<Input
-						id='phone'
-						type='tel'
-						inputMode='tel'
-						autoComplete='tel'
-						autoFocus
-						value={phone}
-						onChange={e => setPhone(e.target.value)}
-						placeholder='+998 90 123 45 67'
-						className='num'
-						aria-invalid={Boolean(error)}
-					/>
+					<div className='flex items-center rounded-full border border-input bg-background focus-within:ring-2 focus-within:ring-ring'>
+						<span className='num select-none pl-4 text-muted-foreground'>+{DIAL}</span>
+						<Input
+							id='phone'
+							type='tel'
+							inputMode='numeric'
+							autoComplete='tel-national'
+							autoFocus
+							value={phone}
+							onChange={e => setPhone(e.target.value.replace(/\D/g, '').slice(0, PHONE_LENGTH))}
+							placeholder='90 123 45 67'
+							className='num border-0 bg-transparent pl-2 shadow-none focus-visible:ring-0'
+							aria-invalid={Boolean(error)}
+						/>
+					</div>
 				</Field>
 				<Button type='submit' className='h-14 w-full' disabled={pending}>
 					{pending ? t('checking') : t('sendCode')}

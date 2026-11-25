@@ -3,13 +3,14 @@ import {
 	backendFetch,
 	clearRefreshCookie,
 	gatewayError,
+	isActiveAdmin,
 	problem,
 	readRefreshCookie,
+	readTokens,
 	revokeRefreshToken,
 	toSessionPayload,
 	writeRefreshCookie,
 } from '@/shared/api/backend.server';
-import type { TokenResponse } from '@/shared/api/types';
 
 /**
  * Exchange the cookie's refresh token for a new access token. The backend rotates the
@@ -31,14 +32,16 @@ export async function POST() {
 		return gatewayError(e);
 	}
 
-	if (res.status >= 500) return problem(502, 'UPSTREAM_ERROR', `Backend responded ${res.status}`);
-	if (!res.ok) {
+	// Only an explicit rejection of the token ends the session; 429/408/5xx are transient.
+	if (res.status === 400 || res.status === 401 || res.status === 403) {
 		await clearRefreshCookie();
 		return problem(401, 'SESSION_EXPIRED');
 	}
+	if (!res.ok) return problem(502, 'UPSTREAM_ERROR', `Backend responded ${res.status}`);
 
-	const tokens = (await res.json()) as TokenResponse;
-	if (!tokens.user?.roles?.includes('ADMIN') || tokens.user.status === 'BLOCKED') {
+	const tokens = await readTokens(res);
+	if (!tokens) return problem(502, 'UPSTREAM_ERROR', 'Backend returned an invalid response');
+	if (!isActiveAdmin(tokens.user)) {
 		if (tokens.refreshToken) await revokeRefreshToken(tokens.refreshToken);
 		await clearRefreshCookie();
 		return problem(403, 'NOT_ADMIN');

@@ -7,7 +7,7 @@ Admin dashboard for the Usta platform — implementation of [`docs/index.md`](do
 ```bash
 cp .env.example .env      # API_URL = backend origin (server-only)
 npm install
-npm run dev               # http://localhost:3000
+npm run dev               # http://localhost:4010
 ```
 
 | Script                                  |                                                             |

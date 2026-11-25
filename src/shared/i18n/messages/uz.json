@@ -152,6 +152,13 @@
 		"notAdmin": "Ruxsat yo'q: bu raqam administrator emas.",
 		"blocked": "Hisob bloklangan.",
 		"invalidPhone": "Raqamni to'liq kiriting",
+		"countries": {
+			"uz": "Oʻzbekiston",
+			"kz": "Qozogʻiston",
+			"kg": "Qirgʻiziston",
+			"tj": "Tojikiston",
+			"tm": "Turkmaniston"
+		},
 		"checking": "Sessiya tekshirilmoqda…"
 	},
 	"overview": {

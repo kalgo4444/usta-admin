@@ -4,12 +4,12 @@ services:
     image: usta-admin
     restart: unless-stopped
     ports:
-      - '${PORT:-3000}:3000'
+      - '${PORT:-4010}:4010'
     environment:
       # Backend origin (runtime, server-only). Empty = the default in src/shared/config/env.ts.
       API_URL: ${API_URL:-}
     healthcheck:
-      test: ['CMD', 'wget', '-qO-', 'http://127.0.0.1:3000/login']
+      test: ['CMD', 'wget', '-qO-', 'http://127.0.0.1:4010/login']
       interval: 30s
       timeout: 5s
       start_period: 20s

@@ -20,7 +20,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
 	const t = useTranslations('auth');
 	const me = useMe();
 	const user = me.data;
-	const denied = user && (!user.roles?.includes('ADMIN') || user.status === 'BLOCKED');
+	const denied = user && (!user.roles?.includes('ADMIN') || user.status !== 'ACTIVE');
 
 	useEffect(() => {
 		if (denied) void logout().finally(() => window.location.replace(routes.login));
