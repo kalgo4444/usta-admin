@@ -13,22 +13,10 @@ import { localeStore } from '@/shared/i18n/locale';
 import { formatPhone } from '@/shared/lib/format';
 import { Button } from '@/shared/ui/kit/button';
 import { Input } from '@/shared/ui/kit/input';
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from '@/shared/ui/kit/select';
 import { Field } from '@/shared/ui/field';
 
-const COUNTRIES = [
-	{ id: 'uz', dial: '998', length: 9, placeholder: '90 123 45 67' },
-	{ id: 'kz', dial: '7', length: 10, placeholder: '701 123 45 67' },
-	{ id: 'kg', dial: '996', length: 9, placeholder: '700 123 456' },
-	{ id: 'tj', dial: '992', length: 9, placeholder: '917 123 456' },
-	{ id: 'tm', dial: '993', length: 8, placeholder: '65 123456' },
-] as const;
+const DIAL = '998';
+const PHONE_LENGTH = 9;
 
 type Step =
 	| { kind: 'phone' }
@@ -65,9 +53,7 @@ export function LoginForm() {
 	const sp = useSearchParams();
 
 	const [step, setStep] = useState<Step>({ kind: 'phone' });
-	const [countryId, setCountryId] = useState<(typeof COUNTRIES)[number]['id']>('uz');
 	const [phone, setPhone] = useState('');
-	const country = COUNTRIES.find(c => c.id === countryId) ?? COUNTRIES[0];
 	const [code, setCode] = useState('');
 	const [error, setError] = useState<string | null>(null);
 	const [pending, setPending] = useState(false);
@@ -128,8 +114,8 @@ export function LoginForm() {
 	};
 
 	if (step.kind === 'phone') {
-		const normalized = `+${country.dial}${phone}`;
-		const valid = phone.length === country.length;
+		const normalized = `+${DIAL}${phone}`;
+		const valid = phone.length === PHONE_LENGTH;
 		return (
 			<form
 				className='space-y-6'
@@ -140,28 +126,8 @@ export function LoginForm() {
 				}}
 			>
 				<Field label={t('phone')} htmlFor='phone' error={error ?? undefined}>
-					<div className='flex gap-2'>
-						<Select
-							value={countryId}
-							onValueChange={v => {
-								setCountryId(v as typeof countryId);
-								setPhone('');
-								setError(null);
-							}}
-						>
-							<SelectTrigger className='w-auto shrink-0' aria-label={t('phone')}>
-								<SelectValue>
-									<span className='num'>+{country.dial}</span>
-								</SelectValue>
-							</SelectTrigger>
-							<SelectContent>
-								{COUNTRIES.map(c => (
-									<SelectItem key={c.id} value={c.id}>
-										{t(`countries.${c.id}`)} <span className='num'>+{c.dial}</span>
-									</SelectItem>
-								))}
-							</SelectContent>
-						</Select>
+					<div className='flex items-center rounded-full border border-input bg-background focus-within:ring-2 focus-within:ring-ring'>
+						<span className='num select-none pl-4 text-muted-foreground'>+{DIAL}</span>
 						<Input
 							id='phone'
 							type='tel'
@@ -169,9 +135,9 @@ export function LoginForm() {
 							autoComplete='tel-national'
 							autoFocus
 							value={phone}
-							onChange={e => setPhone(e.target.value.replace(/\D/g, '').slice(0, country.length))}
-							placeholder={country.placeholder}
-							className='num'
+							onChange={e => setPhone(e.target.value.replace(/\D/g, '').slice(0, PHONE_LENGTH))}
+							placeholder='90 123 45 67'
+							className='num border-0 bg-transparent pl-2 shadow-none focus-visible:ring-0'
 							aria-invalid={Boolean(error)}
 						/>
 					</div>

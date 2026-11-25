@@ -13,7 +13,7 @@ npm run format       # prettier (tailwind class sorting)
 npm run gen:api      # regenerate src/shared/api/schema.d.ts from the live /v3/api-docs
 ```
 
-Docker: `docker compose up --build` serves the standalone Next build on `${PORT:-3000}`; `API_URL` is a runtime, server-only env var (empty falls back to the default in `src/shared/config/env.ts`).
+Docker: `docker compose up --build` serves the standalone Next build on `${PORT:-4010}`; `API_URL` is a runtime, server-only env var (empty falls back to the default in `src/shared/config/env.ts`).
 
 There is no test runner configured. npm is the package manager (`package-lock.json`); `bun.lock` is stale.
 

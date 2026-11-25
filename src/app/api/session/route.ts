@@ -4,15 +4,16 @@ import {
 	backendFetch,
 	clearRefreshCookie,
 	gatewayError,
+	isActiveAdmin,
 	passthrough,
 	problem,
 	readBodyLimited,
+	readTokens,
 	readRefreshCookie,
 	revokeRefreshToken,
 	toSessionPayload,
 	writeRefreshCookie,
 } from '@/shared/api/backend.server';
-import type { TokenResponse } from '@/shared/api/types';
 
 /** Login: verify OTP, require ADMIN role, store refresh token in an httpOnly cookie. */
 export async function POST(req: NextRequest) {
@@ -33,12 +34,12 @@ export async function POST(req: NextRequest) {
 	}
 	if (!res.ok) return passthrough(res);
 
-	const tokens = (await res.json()) as TokenResponse;
+	const tokens = await readTokens(res);
+	if (!tokens) return problem(502, 'UPSTREAM_ERROR', 'Backend returned an invalid response');
 	const user = tokens.user;
-	const isAdmin = user?.roles?.includes('ADMIN');
-	if (!isAdmin || user?.status === 'BLOCKED') {
+	if (!isActiveAdmin(user)) {
 		if (tokens.refreshToken) await revokeRefreshToken(tokens.refreshToken, lang);
-		return problem(403, isAdmin ? 'USER_BLOCKED' : 'NOT_ADMIN');
+		return problem(403, user?.roles?.includes('ADMIN') ? 'USER_BLOCKED' : 'NOT_ADMIN');
 	}
 
 	await writeRefreshCookie(tokens);
