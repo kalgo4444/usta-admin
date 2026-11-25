@@ -10,10 +10,25 @@ import { sessionStore, type SessionPayload } from '@/shared/api/session';
 import type { OtpChallengeResponse } from '@/shared/api/types';
 import { routes } from '@/shared/config/routes';
 import { localeStore } from '@/shared/i18n/locale';
-import { formatPhone, normalizePhone } from '@/shared/lib/format';
+import { formatPhone } from '@/shared/lib/format';
 import { Button } from '@/shared/ui/kit/button';
 import { Input } from '@/shared/ui/kit/input';
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from '@/shared/ui/kit/select';
 import { Field } from '@/shared/ui/field';
+
+const COUNTRIES = [
+	{ id: 'uz', dial: '998', length: 9, placeholder: '90 123 45 67' },
+	{ id: 'kz', dial: '7', length: 10, placeholder: '701 123 45 67' },
+	{ id: 'kg', dial: '996', length: 9, placeholder: '700 123 456' },
+	{ id: 'tj', dial: '992', length: 9, placeholder: '917 123 456' },
+	{ id: 'tm', dial: '993', length: 8, placeholder: '65 123456' },
+] as const;
 
 type Step =
 	| { kind: 'phone' }
@@ -50,7 +65,9 @@ export function LoginForm() {
 	const sp = useSearchParams();
 
 	const [step, setStep] = useState<Step>({ kind: 'phone' });
-	const [phone, setPhone] = useState('+998 ');
+	const [countryId, setCountryId] = useState<(typeof COUNTRIES)[number]['id']>('uz');
+	const [phone, setPhone] = useState('');
+	const country = COUNTRIES.find(c => c.id === countryId) ?? COUNTRIES[0];
 	const [code, setCode] = useState('');
 	const [error, setError] = useState<string | null>(null);
 	const [pending, setPending] = useState(false);
@@ -111,8 +128,8 @@ export function LoginForm() {
 	};
 
 	if (step.kind === 'phone') {
-		const normalized = normalizePhone(phone);
-		const valid = /^\+998\d{9}$/.test(normalized);
+		const normalized = `+${country.dial}${phone}`;
+		const valid = phone.length === country.length;
 		return (
 			<form
 				className='space-y-6'
@@ -123,18 +140,41 @@ export function LoginForm() {
 				}}
 			>
 				<Field label={t('phone')} htmlFor='phone' error={error ?? undefined}>
-					<Input
-						id='phone'
-						type='tel'
-						inputMode='tel'
-						autoComplete='tel'
-						autoFocus
-						value={phone}
-						onChange={e => setPhone(e.target.value)}
-						placeholder='+998 90 123 45 67'
-						className='num'
-						aria-invalid={Boolean(error)}
-					/>
+					<div className='flex gap-2'>
+						<Select
+							value={countryId}
+							onValueChange={v => {
+								setCountryId(v as typeof countryId);
+								setPhone('');
+								setError(null);
+							}}
+						>
+							<SelectTrigger className='w-auto shrink-0' aria-label={t('phone')}>
+								<SelectValue>
+									<span className='num'>+{country.dial}</span>
+								</SelectValue>
+							</SelectTrigger>
+							<SelectContent>
+								{COUNTRIES.map(c => (
+									<SelectItem key={c.id} value={c.id}>
+										{t(`countries.${c.id}`)} <span className='num'>+{c.dial}</span>
+									</SelectItem>
+								))}
+							</SelectContent>
+						</Select>
+						<Input
+							id='phone'
+							type='tel'
+							inputMode='numeric'
+							autoComplete='tel-national'
+							autoFocus
+							value={phone}
+							onChange={e => setPhone(e.target.value.replace(/\D/g, '').slice(0, country.length))}
+							placeholder={country.placeholder}
+							className='num'
+							aria-invalid={Boolean(error)}
+						/>
+					</div>
 				</Field>
 				<Button type='submit' className='h-14 w-full' disabled={pending}>
 					{pending ? t('checking') : t('sendCode')}
