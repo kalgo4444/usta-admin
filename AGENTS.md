@@ -1,6 +1,6 @@
 # AGENTS.md
 
-Admin dashboard for the Usta platform (Next.js 16 App Router, React 19, TypeScript, Tailwind 4). The product spec is `docs/index.md` (Uzbek); UI rules are in `DESIGN.md` (single blue accent, pill controls, 24px cards, monospace numerals via the `num` utility). `AGENTS.md` warns that this Next.js version has breaking changes — read `node_modules/next/dist/docs/` before relying on memory of Next APIs.
+Admin dashboard for the Usta platform (Next.js 16 App Router, React 19, TypeScript, Tailwind 4). The product spec is `docs/index.md` (Uzbek); UI rules are in `DESIGN.md` (single blue accent, pill controls, 24px cards, monospace numerals via the `num` utility). This Next.js version has breaking changes (see the last section) — read `node_modules/next/dist/docs/` before relying on memory of Next APIs.
 
 ## Commands
 
@@ -10,12 +10,16 @@ npm run build        # production build — the real check for cacheComponents/S
 npm run lint         # eslint (react-hooks/refs and react-compiler rules are errors)
 npm run typecheck    # tsc --noEmit
 npm run format       # prettier (tailwind class sorting)
-npm run gen:api      # regenerate src/shared/api/schema.d.ts from the live /v3/api-docs
+API_URL=<origin> npm run gen:api   # regenerate src/shared/api/schema.d.ts from the live /v3/api-docs
+npm test                           # Vitest unit tests
+npx vitest run src/shared/api/session.test.ts -t 'in-flight'   # one file / one test
+npm run build && npm run test:e2e  # Playwright E2E against the production build
+npx playwright test e2e/masters.spec.ts -g 'approving'      # one spec / one test
 ```
 
-Docker: `docker compose up --build` serves the standalone Next build on `${PORT:-4010}`; `API_URL` is a runtime, server-only env var (empty falls back to the default in `src/shared/config/env.ts`).
+Docker: `docker compose up --build` serves the standalone Next build on `${PORT:-4010}`; `API_URL` is a runtime, server-only env var and is required: `src/instrumentation.ts` refuses to start the server without it (the build doesn't need it). Healthcheck: `GET /api/health`. CI (`.github/workflows/ci.yml`) runs prettier check, lint, typecheck, unit tests, build and E2E.
 
-There is no test runner configured. npm is the package manager (`package-lock.json`); `bun.lock` is stale.
+Tests: `npm test` (Vitest, `src/**/*.test.ts`, node env — no DOM, so hooks/components are covered by E2E) and `npm run test:e2e` (Playwright in `e2e/`, needs `npm run build` first; it runs `next start` on port 4020 and mocks `/api/session/*` + `/api/v1/**` in the browser via `e2e/mock-api.ts`, so no backend is needed; Playwright matches the most recently registered route first, so register specific mocks after `mockAdminSession`). npm is the package manager (`package-lock.json`); `bun.lock` is stale.
 
 If `tsc`/`build` fails on `.next/dev/types/validator.ts` referencing deleted routes, delete the stale files in `.next/dev/types/` (the project denies `rm -rf`, so remove the files individually).
 
@@ -47,6 +51,8 @@ If `tsc`/`build` fails on `.next/dev/types/validator.ts` referencing deleted rou
 - Catalog items are never deleted, only set `INACTIVE`. ADMIN users can't be blocked (the Block button is hidden).
 - `react-hook-form`'s `watch()` breaks the React Compiler lint rule — use `useWatch`. Form dialogs are split so the form component mounts per open (fresh defaults instead of reset effects); avoid reading refs during render.
 - `DataTable` uses `"use no memo"` because the TanStack table instance is mutable.
+- CSP is a static header in `next.config.ts`, deliberately without nonces (nonces force dynamic rendering and break PPR). A new external origin (iframe, fetch, font) must be added there; `connect-src` is `'self'` because all API traffic goes through the proxy.
+- `src/instrumentation.ts` validates `API_URL` at server start via `instrumentation.node.ts` (`process.exit` lives there because it can't be bundled for the Edge runtime); it is skipped during `next build`.
 - The OTP flow can't be exercised without a real admin phone (`ADMIN_PHONES` on the backend); for UI work, mock `/api/session/refresh` and `/api/v1/**` in the browser with a fake `usta_rt` cookie.
 
 <!-- BEGIN:nextjs-agent-rules -->
