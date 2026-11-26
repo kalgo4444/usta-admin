@@ -12,3 +12,25 @@ export function safeHttpUrl(url: string | null | undefined): string | undefined 
 		return undefined;
 	}
 }
+
+/**
+ * Same-origin path to go to after login, or `fallback`. Rejects other origins, the login
+ * page itself, and paths that normalise to `//host` (e.g. `/.//evil.com`), which the
+ * router would treat as a protocol-relative URL to another site.
+ */
+export function safeNextPath(
+	next: string | null,
+	origin: string,
+	fallback: string,
+	loginPath: string,
+): string {
+	if (!next) return fallback;
+	try {
+		const u = new URL(next, origin);
+		const isLogin = u.pathname === loginPath || u.pathname.startsWith(`${loginPath}/`);
+		if (u.origin !== origin || isLogin || !/^\/(?![/\\])/.test(u.pathname)) return fallback;
+		return u.pathname + u.search + u.hash;
+	} catch {
+		return fallback;
+	}
+}

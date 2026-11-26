@@ -46,6 +46,17 @@ const nextConfig: NextConfig = {
 						: []),
 				],
 			},
+			// Overrides the page CSP above (last match wins): proxied backend responses are
+			// served from this origin, so a directly opened HTML/SVG must not run scripts.
+			{
+				source: '/api/:path*',
+				headers: [
+					{
+						key: 'Content-Security-Policy',
+						value: "default-src 'none'; sandbox; frame-ancestors 'none'",
+					},
+				],
+			},
 		];
 	},
 	turbopack: {
