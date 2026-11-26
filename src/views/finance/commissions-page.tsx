@@ -2,8 +2,8 @@
 
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
-import { useCommissions } from '@/entities/finance/api';
-import { MasterPicker, useMasterNames } from '@/features/select-master/master-picker';
+import { useCommissions } from '@/entities/finance';
+import { MasterPicker, useMasterNames } from '@/features/select-master';
 import { ENUMS, type Commission, type CommissionStatus } from '@/shared/api/types';
 import { routes } from '@/shared/config/routes';
 import { useEnumLabel } from '@/shared/i18n/use-enum';

@@ -9,6 +9,7 @@ import { formatBytes, formatDate } from '@/shared/lib/format';
 import { Button } from '@/shared/ui/kit/button';
 import { Dialog, DialogContent, DialogTitle } from '@/shared/ui/kit/dialog';
 import { ExternalLink } from '@/shared/ui/external-link';
+import { RemoteImage } from '@/shared/ui/remote-image';
 
 const ORDER: DocumentType[] = ['PASSPORT', 'SELFIE', 'CERTIFICATE', 'OTHER'];
 const isImage = (d: { contentType?: string }) => d.contentType?.startsWith('image/');
@@ -44,8 +45,7 @@ export function DocumentsGallery({ documents }: { documents: MasterDocument[] })
 										onClick={() => setIndex(images.indexOf(d))}
 										className='group relative aspect-[4/3] overflow-hidden rounded-lg border border-border bg-muted'
 									>
-										{/* eslint-disable-next-line @next/next/no-img-element -- presigned, expiring URL */}
-										<img
+										<RemoteImage
 											src={d.url}
 											alt={label('DocumentType', d.type)}
 											className='size-full object-cover transition-transform group-hover:scale-[1.02]'
@@ -81,8 +81,12 @@ export function DocumentsGallery({ documents }: { documents: MasterDocument[] })
 								</span>
 							</DialogTitle>
 							<div className='relative flex items-center justify-center rounded-lg bg-black'>
-								{/* eslint-disable-next-line @next/next/no-img-element */}
-								<img src={current.url} alt='' className='max-h-[75vh] w-auto object-contain' />
+								<RemoteImage
+									eager
+									src={current.url}
+									alt=''
+									className='max-h-[75vh] w-auto object-contain'
+								/>
 								{images.length > 1 && (
 									<>
 										<Button

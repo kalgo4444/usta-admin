@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import { PageFallback } from '@/shared/ui/page-fallback';
-import { OverviewPage } from '@/views/overview/overview-page';
+import { OverviewPage } from '@/views/overview';
 
 export const metadata: Metadata = { title: 'Overview' };
 

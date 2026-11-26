@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { StarIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { masterName, useAdminMasters } from '@/entities/master/api';
+import { masterName, useAdminMasters } from '@/entities/master';
 import type { AdminMaster, VerificationStatus } from '@/shared/api/types';
 import { routes } from '@/shared/config/routes';
 import { useEnumLabel } from '@/shared/i18n/use-enum';
@@ -11,7 +11,7 @@ import { formatDate } from '@/shared/lib/format';
 import { ALL, useTableParams } from '@/shared/lib/use-table-params';
 import { Tabs, TabsList, TabsTrigger } from '@/shared/ui/kit/tabs';
 import { columnHelper, DataTable } from '@/shared/ui/data-table';
-import { MasterAvatar } from '@/widgets/master-detail/master-avatar';
+import { MasterAvatar } from '@/widgets/master-detail';
 import { PageHeader } from '@/shared/ui/page-header';
 import { PhoneText } from '@/shared/ui/phone-text';
 import { StatusBadge } from '@/shared/ui/status-badge';

@@ -1,22 +1,34 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { PencilIcon, PlusIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useCategories, useServices } from '@/entities/catalog/api';
-import { buildCategoryTree, flattenTree, localized } from '@/entities/catalog/model';
-import { CatalogIcon } from '@/entities/catalog/ui';
-import { DeleteCatalogItemButton } from '@/features/delete-catalog-item/delete-catalog-item';
-import { ServiceFormDialog } from '@/features/service-form/service-form-dialog';
+import {
+	useCategories,
+	useServices,
+	buildCategoryTree,
+	flattenTree,
+	localized,
+	CatalogIcon,
+} from '@/entities/catalog';
+import dynamic from 'next/dynamic';
+import { DeleteCatalogItemButton } from '@/features/delete-catalog-item';
 import type { CatalogService } from '@/shared/api/types';
 import { useLocale } from '@/shared/i18n/locale';
 import { formatDate } from '@/shared/lib/format';
 import { useTableParams } from '@/shared/lib/use-table-params';
 import { cn } from '@/shared/lib/utils';
+import { useOpenedOnce } from '@/shared/lib/use-opened-once';
 import { Button } from '@/shared/ui/kit/button';
 import { columnHelper, DataTable } from '@/shared/ui/data-table';
 import { PageHeader } from '@/shared/ui/page-header';
 import { StatusBadge } from '@/shared/ui/status-badge';
+import { RemoteImage } from '@/shared/ui/remote-image';
+
+/** Loaded on first open: keeps zod + react-hook-form out of the page's initial JS. */
+const ServiceFormDialog = dynamic(() =>
+	import('@/features/catalog-form').then(m => m.ServiceFormDialog),
+);
 
 const col = columnHelper<CatalogService>();
 
@@ -29,20 +41,12 @@ export function ServicesPage() {
 	const categories = useCategories();
 	const q = useServices({ categoryId });
 	const [dialog, setDialog] = useState<{ service?: CatalogService } | null>(null);
+	const dialogMounted = useOpenedOnce(dialog !== null);
 
-	const flat = useMemo(
-		() => flattenTree(buildCategoryTree(categories.data ?? [])),
-		[categories.data],
-	);
-	const catName = useMemo(() => {
-		const m = new Map<string, string>();
-		for (const c of categories.data ?? []) if (c.id) m.set(c.id, localized(c.name, locale));
-		return m;
-	}, [categories.data, locale]);
-	const rows = useMemo(
-		() => [...(q.data ?? [])].sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0)),
-		[q.data],
-	);
+	const flat = flattenTree(buildCategoryTree(categories.data ?? []));
+	const catName = new Map<string, string>();
+	for (const c of categories.data ?? []) if (c.id) catName.set(c.id, localized(c.name, locale));
+	const rows = [...(q.data ?? [])].sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
 
 	const columns = [
 		col.display({
@@ -52,8 +56,11 @@ export function ServicesPage() {
 				<span className='flex items-center gap-2'>
 					<CatalogIcon url={row.original.iconUrl} className='size-5' />
 					{row.original.imageUrl && (
-						// eslint-disable-next-line @next/next/no-img-element -- presigned URL
-						<img src={row.original.imageUrl} alt='' className='size-8 rounded-sm object-cover' />
+						<RemoteImage
+							src={row.original.imageUrl}
+							alt=''
+							className='size-8 rounded-sm object-cover'
+						/>
 					)}
 				</span>
 			),
@@ -160,13 +167,15 @@ export function ServicesPage() {
 					getRowId={r => r.id!}
 				/>
 			</div>
-			<ServiceFormDialog
-				open={dialog !== null}
-				onOpenChange={o => !o && setDialog(null)}
-				categories={categories.data ?? []}
-				service={dialog?.service}
-				defaultCategoryId={categoryId}
-			/>
+			{dialogMounted && (
+				<ServiceFormDialog
+					open={dialog !== null}
+					onOpenChange={o => !o && setDialog(null)}
+					categories={categories.data ?? []}
+					service={dialog?.service}
+					defaultCategoryId={categoryId}
+				/>
+			)}
 		</div>
 	);
 }

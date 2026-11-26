@@ -10,7 +10,7 @@ import type {
 	Page,
 } from '@/shared/api/types';
 
-export interface ComplaintsParams {
+interface ComplaintsParams {
 	status?: ComplaintStatus;
 	orderId?: string;
 	againstUserId?: string;

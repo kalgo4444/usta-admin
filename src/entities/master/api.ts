@@ -13,7 +13,7 @@ import type {
 	VerificationStatus,
 } from '@/shared/api/types';
 
-export interface MastersParams {
+interface MastersParams {
 	status?: VerificationStatus;
 	page?: number;
 	size?: number;

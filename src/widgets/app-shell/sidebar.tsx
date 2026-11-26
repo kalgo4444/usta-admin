@@ -3,8 +3,8 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { useCount } from '@/entities/system/api';
-import { useAccess } from '@/entities/user/api';
+import { useCount } from '@/entities/system';
+import { useAccess } from '@/entities/user';
 import { cn } from '@/shared/lib/utils';
 import { isActive, NAV, type NavItem } from './nav';
 

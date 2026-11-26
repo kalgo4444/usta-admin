@@ -37,10 +37,10 @@ import {
 } from '@/shared/ui/kit/table';
 import { EmptyState, ErrorState } from './error-state';
 
-export const tableFeatureSet = tableFeatures({ rowSortingFeature });
-export type TableFeatureSet = typeof tableFeatureSet;
+const tableFeatureSet = tableFeatures({ rowSortingFeature });
+type TableFeatureSet = typeof tableFeatureSet;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type Columns<T extends RowData> = ColumnDef<TableFeatureSet, T, any>[];
+type Columns<T extends RowData> = ColumnDef<TableFeatureSet, T, any>[];
 
 /** Column helper bound to the shared feature set. Mark server-sortable columns with `enableSorting: true`. */
 export const columnHelper = <T extends RowData>() => createColumnHelper<TableFeatureSet, T>();

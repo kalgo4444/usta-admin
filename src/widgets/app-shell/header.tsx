@@ -8,7 +8,7 @@ import { logout } from '@/shared/api/session';
 import type { UserResponse } from '@/shared/api/types';
 import { routes } from '@/shared/config/routes';
 import { formatPhone } from '@/shared/lib/format';
-import { PreferencesMenu } from '@/features/preferences/preferences-menu';
+import { PreferencesMenu } from '@/features/preferences';
 import { Button } from '@/shared/ui/kit/button';
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '@/shared/ui/kit/sheet';
 import { Brand, SidebarNav } from './sidebar';

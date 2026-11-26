@@ -3,18 +3,24 @@
 import { useState } from 'react';
 import { PencilIcon, PlusIcon, ShieldCheckIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useAdmins, usePermissionOptions } from '@/entities/admin/api';
-import { AdminFormDialog } from '@/features/manage-admin/admin-form-dialog';
-import { RemoveAdminButton } from '@/features/manage-admin/remove-admin-button';
+import dynamic from 'next/dynamic';
+import { useAdmins, usePermissionOptions } from '@/entities/admin';
+import { RemoveAdminButton } from '@/features/manage-admin';
 import type { AdminAccount } from '@/shared/api/types';
 import { useEnumLabel } from '@/shared/i18n/use-enum';
 import { formatDate } from '@/shared/lib/format';
+import { useOpenedOnce } from '@/shared/lib/use-opened-once';
 import { Badge } from '@/shared/ui/kit/badge';
 import { Button } from '@/shared/ui/kit/button';
 import { columnHelper, DataTable } from '@/shared/ui/data-table';
 import { PageHeader } from '@/shared/ui/page-header';
 import { PhoneText } from '@/shared/ui/phone-text';
 import { StatusBadge } from '@/shared/ui/status-badge';
+
+/** Loaded on first open: keeps zod + react-hook-form out of the page's initial JS. */
+const AdminFormDialog = dynamic(() =>
+	import('@/features/manage-admin').then(m => m.AdminFormDialog),
+);
 
 const col = columnHelper<AdminAccount>();
 
@@ -27,6 +33,7 @@ export function AdminsPage() {
 	const options = usePermissionOptions();
 	const names = new Map((options.data ?? []).map(o => [o.code, o.name]));
 	const [dialog, setDialog] = useState<{ admin?: AdminAccount } | null>(null);
+	const dialogMounted = useOpenedOnce(dialog !== null);
 
 	const columns = [
 		col.accessor('phone', {
@@ -110,11 +117,13 @@ export function AdminsPage() {
 				onRetry={() => q.refetch()}
 				getRowId={r => r.id!}
 			/>
-			<AdminFormDialog
-				open={dialog !== null}
-				onOpenChange={o => !o && setDialog(null)}
-				admin={dialog?.admin}
-			/>
+			{dialogMounted && (
+				<AdminFormDialog
+					open={dialog !== null}
+					onOpenChange={o => !o && setDialog(null)}
+					admin={dialog?.admin}
+				/>
+			)}
 		</div>
 	);
 }

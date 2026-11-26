@@ -24,7 +24,6 @@ const csp = [
 ].join('; ');
 
 const nextConfig: NextConfig = {
-	/* config options here */
 	output: 'standalone',
 	cacheComponents: true,
 	partialPrefetching: true,

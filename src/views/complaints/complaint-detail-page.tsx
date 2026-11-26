@@ -4,12 +4,12 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { GavelIcon, MessagesSquareIcon, PackageIcon, TriangleAlertIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useAdminComplaint } from '@/entities/complaint/api';
-import { useAdminOrder } from '@/entities/order/api';
-import { useAdmins } from '@/entities/admin/api';
-import { useAccess } from '@/entities/user/api';
-import { UserBlockActions } from '@/features/block-user/user-block-actions';
-import { ComplaintActions } from '@/features/complaint-actions/complaint-actions';
+import { useAdminComplaint } from '@/entities/complaint';
+import { useAdminOrder } from '@/entities/order';
+import { useAdmins } from '@/entities/admin';
+import { useAccess } from '@/entities/user';
+import { UserBlockActions } from '@/features/block-user';
+import { ComplaintActions } from '@/features/complaint-actions';
 import { routes, withQuery } from '@/shared/config/routes';
 import { formatDate } from '@/shared/lib/format';
 import { BackLink } from '@/shared/ui/back-link';
@@ -22,7 +22,7 @@ import { ErrorState } from '@/shared/ui/error-state';
 import { InfoRow } from '@/shared/ui/page-header';
 import { PhoneText } from '@/shared/ui/phone-text';
 import { StatusBadge } from '@/shared/ui/status-badge';
-import { ChatViewer } from '@/widgets/order-detail/chat-viewer';
+import { ChatViewer } from '@/widgets/order-detail';
 
 export function ComplaintDetailPage() {
 	const { id } = useParams<{ id: string }>();

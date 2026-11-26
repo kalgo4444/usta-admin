@@ -5,7 +5,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { CircleCheckIcon, RotateCcwIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
-import { DEAD_EVENTS_LIMIT, systemApi, useDeadEvents } from '@/entities/system/api';
+import { DEAD_EVENTS_LIMIT, systemApi, useDeadEvents } from '@/entities/system';
 import { useMutationErrorHandler } from '@/shared/api/use-mutation-error';
 import { formatDate } from '@/shared/lib/format';
 import { Button } from '@/shared/ui/kit/button';

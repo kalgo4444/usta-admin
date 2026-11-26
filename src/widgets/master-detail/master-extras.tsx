@@ -2,13 +2,14 @@
 
 import { StarIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useMasterPortfolio, useMasterReviews, useMasterServices } from '@/entities/master/api';
+import { useMasterPortfolio, useMasterReviews, useMasterServices } from '@/entities/master';
 import { formatDate, formatMoney } from '@/shared/lib/format';
 import { Button } from '@/shared/ui/kit/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/kit/card';
 import { Skeleton } from '@/shared/ui/kit/skeleton';
 import { ErrorState } from '@/shared/ui/error-state';
 import { ExternalLink } from '@/shared/ui/external-link';
+import { RemoteImage } from '@/shared/ui/remote-image';
 
 export function MasterServices({ id }: { id: string }) {
 	const t = useTranslations('masters');
@@ -75,8 +76,11 @@ export function MasterPortfolio({ id }: { id: string }) {
 								className='aspect-square overflow-hidden rounded-md border border-border bg-muted'
 							>
 								{p.contentType?.startsWith('image/') ? (
-									// eslint-disable-next-line @next/next/no-img-element
-									<img src={p.url} alt={p.description ?? ''} className='size-full object-cover' />
+									<RemoteImage
+										src={p.url}
+										alt={p.description ?? ''}
+										className='size-full object-cover'
+									/>
 								) : (
 									<span className='flex size-full items-center justify-center text-xs text-muted-foreground'>
 										{p.contentType}

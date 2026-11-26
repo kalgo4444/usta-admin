@@ -1,4 +1,5 @@
 import { cn } from '@/shared/lib/utils';
+import { RemoteImage } from '@/shared/ui/remote-image';
 
 export function MasterAvatar({
 	url,
@@ -26,8 +27,7 @@ export function MasterAvatar({
 			style={{ width: size, height: size }}
 		>
 			{url ? (
-				// eslint-disable-next-line @next/next/no-img-element -- presigned URL, no optimisation wanted
-				<img src={url} alt='' className='size-full object-cover' />
+				<RemoteImage eager src={url} alt='' className='size-full object-cover' />
 			) : (
 				initials || '?'
 			)}

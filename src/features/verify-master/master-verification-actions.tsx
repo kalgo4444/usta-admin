@@ -5,7 +5,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { CheckIcon, XIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
-import { masterApi, masterName } from '@/entities/master/api';
+import { masterApi, masterName } from '@/entities/master';
 import { invalidate } from '@/shared/api/invalidate';
 import type { MasterProfile } from '@/shared/api/types';
 import { useMutationErrorHandler } from '@/shared/api/use-mutation-error';
