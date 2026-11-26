@@ -17,7 +17,7 @@ npm run build && npm run test:e2e  # Playwright E2E against the production build
 npx playwright test e2e/masters.spec.ts -g 'approving'      # one spec / one test
 ```
 
-Docker: `docker compose up --build` serves the standalone Next build on `${PORT:-4010}`; `API_URL` is a runtime, server-only env var and is required: `src/instrumentation.ts` refuses to start the server without it (the build doesn't need it). Healthcheck: `GET /api/health`. CI (`.github/workflows/ci.yml`) runs prettier check, lint, typecheck, unit tests, build and E2E.
+Docker: `docker compose up --build` serves the standalone Next build on `${PORT:-4010}`; `API_URL` is a runtime, server-only env var and is required: `src/instrumentation.ts` refuses to start the server without it (the build doesn't need it). Healthcheck: `GET /api/health`.
 
 Tests: `npm test` (Vitest, `src/**/*.test.ts`, node env — no DOM, so hooks/components are covered by E2E) and `npm run test:e2e` (Playwright in `e2e/`, needs `npm run build` first; it runs `next start` on port 4020 and mocks `/api/session/*` + `/api/v1/**` in the browser via `e2e/mock-api.ts`, so no backend is needed; Playwright matches the most recently registered route first, so register specific mocks after `mockAdminSession`). npm is the package manager (`package-lock.json`); `bun.lock` is stale.
 

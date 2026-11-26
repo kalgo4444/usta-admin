@@ -11,6 +11,7 @@ import type { OtpChallengeResponse } from '@/shared/api/types';
 import { routes } from '@/shared/config/routes';
 import { localeStore } from '@/shared/i18n/locale';
 import { formatPhone } from '@/shared/lib/format';
+import { safeNextPath } from '@/shared/lib/url';
 import { Button } from '@/shared/ui/kit/button';
 import { Input } from '@/shared/ui/kit/input';
 import { Field } from '@/shared/ui/field';
@@ -30,20 +31,6 @@ function useCountdown(until: number | null) {
 		return () => clearInterval(t);
 	}, [until]);
 	return until ? Math.max(0, Math.ceil((until - now) / 1000)) : 0;
-}
-
-function safeNext(next: string | null) {
-	if (!next) return routes.overview;
-	try {
-		const u = new URL(next, window.location.origin);
-		const isLogin = u.pathname === routes.login || u.pathname.startsWith(`${routes.login}/`);
-		if (u.origin !== window.location.origin || isLogin) {
-			return routes.overview;
-		}
-		return u.pathname + u.search + u.hash;
-	} catch {
-		return routes.overview;
-	}
 }
 
 export function LoginForm() {
@@ -104,7 +91,9 @@ export function LoginForm() {
 			const body = await res.json().catch(() => ({}));
 			if (!res.ok) throw problemToApiError(res.status, body);
 			sessionStore.set(body as SessionPayload);
-			router.replace(safeNext(sp.get('next')));
+			router.replace(
+				safeNextPath(sp.get('next'), window.location.origin, routes.overview, routes.login),
+			);
 		} catch (e) {
 			setError(describe(e));
 			setCode('');
