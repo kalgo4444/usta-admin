@@ -127,7 +127,7 @@ export function LoginForm() {
 			>
 				<Field label={t('phone')} htmlFor='phone' error={error ?? undefined}>
 					<div className='flex items-center rounded-full border border-input bg-background focus-within:ring-2 focus-within:ring-ring'>
-						<span className='num select-none pl-4 text-muted-foreground'>+{DIAL}</span>
+						<span className='pl-4 num text-muted-foreground select-none'>+{DIAL}</span>
 						<Input
 							id='phone'
 							type='tel'
@@ -137,7 +137,7 @@ export function LoginForm() {
 							value={phone}
 							onChange={e => setPhone(e.target.value.replace(/\D/g, '').slice(0, PHONE_LENGTH))}
 							placeholder='90 123 45 67'
-							className='num border-0 bg-transparent pl-2 shadow-none focus-visible:ring-0'
+							className='border-0 bg-transparent pl-2 num shadow-none focus-visible:ring-0'
 							aria-invalid={Boolean(error)}
 						/>
 					</div>
