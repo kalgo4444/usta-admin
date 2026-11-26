@@ -3,12 +3,15 @@ import 'server-only';
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 import { BACKEND_ORIGIN, REFRESH_COOKIE } from '@/shared/config/env';
+import { isAdmin } from '@/shared/lib/access';
 import type { TokenResponse } from './types';
 
 const TIMEOUT_MS = 65_000;
 
-/** The admin UI only sends JSON; anything bigger is rejected before buffering. */
+/** JSON bodies are small; anything bigger is rejected before buffering. */
 export const MAX_BODY_BYTES = 1024 * 1024;
+/** Catalog images are ≤ 5 MB; leave room for the multipart envelope. */
+export const MAX_UPLOAD_BYTES = 6 * 1024 * 1024;
 
 /** RFC 9457 problem+json response, the same shape the backend uses (`status`, `code`, `detail`). */
 export function problem(status: number, code: string, detail?: string) {
@@ -97,9 +100,9 @@ export async function readTokens(res: Response): Promise<TokenResponse | null> {
 	}
 }
 
-/** Only an ACTIVE user with the ADMIN role may hold an admin session. */
+/** Only an ACTIVE user with the ADMIN or SUPER_ADMIN role may hold an admin session. */
 export function isActiveAdmin(user: TokenResponse['user'] | undefined) {
-	return Boolean(user?.roles?.includes('ADMIN')) && user?.status === 'ACTIVE';
+	return isAdmin(user) && user?.status === 'ACTIVE';
 }
 
 export async function readRefreshCookie() {

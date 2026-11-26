@@ -8,7 +8,7 @@ import { useTranslations } from 'next-intl';
 import { Controller, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
-import { catalogApi, catalogKeys } from '@/entities/catalog/api';
+import { catalogApi, catalogKeys, useCatalogIcons } from '@/entities/catalog/api';
 import {
 	buildCategoryTree,
 	flattenTree,
@@ -17,6 +17,8 @@ import {
 	SLUG_RE,
 	slugify,
 } from '@/entities/catalog/model';
+import { IconPicker } from '@/entities/catalog/ui';
+import { CatalogMedia } from '@/features/catalog-media/catalog-media';
 import { invalidate } from '@/shared/api/invalidate';
 import type { Category } from '@/shared/api/types';
 import { useMutationErrorHandler } from '@/shared/api/use-mutation-error';
@@ -83,18 +85,22 @@ function CategoryForm({
 	const qc = useQueryClient();
 	const onError = useMutationErrorHandler();
 	const [autoSlug, setAutoSlug] = useState(!category);
+	const [customIcon, setCustomIcon] = useState(Boolean(category?.customIcon));
+	const icons = useCatalogIcons();
+	const iconKeys = useMemo(() => new Set((icons.data ?? []).map(i => i.key)), [icons.data]);
 
+	// uz, ru, en are required (2–120); uzCyrl is transliterated from uz when empty.
+	const name = z
+		.string()
+		.trim()
+		.min(1, te('required'))
+		.min(2, te('minLength', { min: 2 }))
+		.max(120, te('maxLength', { max: 120 }));
 	const schema = z.object({
-		nameUz: z
-			.string()
-			.trim()
-			.min(1, te('required'))
-			.max(120, te('maxLength', { max: 120 })),
-		nameRu: z
-			.string()
-			.trim()
-			.max(120, te('maxLength', { max: 120 })),
-		nameEn: z
+		nameUz: name,
+		nameRu: name,
+		nameEn: name,
+		nameUzCyrl: z
 			.string()
 			.trim()
 			.max(120, te('maxLength', { max: 120 })),
@@ -105,10 +111,7 @@ function CategoryForm({
 			.max(80, te('maxLength', { max: 80 }))
 			.regex(SLUG_RE, t('slugInvalid')),
 		parentId: z.string(),
-		icon: z
-			.string()
-			.trim()
-			.max(255, te('maxLength', { max: 255 })),
+		icon: z.string().refine(k => !k || !icons.data || iconKeys.has(k), t('unknownIcon')),
 		sortOrder: z
 			.number({ error: te('invalidNumber') })
 			.int()
@@ -123,6 +126,7 @@ function CategoryForm({
 		nameUz: category?.name?.uz ?? '',
 		nameRu: category?.name?.ru ?? '',
 		nameEn: category?.name?.en ?? '',
+		nameUzCyrl: category?.name?.uzCyrl ?? '',
 		slug: category?.slug ?? '',
 		parentId: category ? (category.parentId ?? ROOT) : (defaultParentId ?? ROOT),
 		icon: category?.icon ?? '',
@@ -141,10 +145,11 @@ function CategoryForm({
 
 	const submit = form.handleSubmit(async v => {
 		const body = {
-			name: { uz: v.nameUz, ru: v.nameRu || undefined, en: v.nameEn || undefined },
+			name: { uz: v.nameUz, ru: v.nameRu, en: v.nameEn, uzCyrl: v.nameUzCyrl || undefined },
 			slug: v.slug,
 			parentId: v.parentId === ROOT ? undefined : v.parentId,
-			icon: v.icon || undefined,
+			// Sending a key replaces an uploaded icon, so keep it out unless it was changed.
+			icon: customIcon && v.icon === (category?.icon ?? '') ? undefined : v.icon || undefined,
 			sortOrder: v.sortOrder,
 			status: v.status,
 		};
@@ -182,10 +187,29 @@ function CategoryForm({
 					})}
 				/>
 			</Field>
-			<Field label={t('nameLang', { lang: 'ru' })} htmlFor='c-ru' error={err.nameRu?.message}>
+			<Field
+				label={t('nameLang', { lang: 'uz-Cyrl' })}
+				htmlFor='c-uzc'
+				hint={t('uzCyrlHint')}
+				error={err.nameUzCyrl?.message}
+				className='sm:col-span-2'
+			>
+				<Input id='c-uzc' {...form.register('nameUzCyrl')} />
+			</Field>
+			<Field
+				label={t('nameLang', { lang: 'ru' })}
+				htmlFor='c-ru'
+				required
+				error={err.nameRu?.message}
+			>
 				<Input id='c-ru' {...form.register('nameRu')} />
 			</Field>
-			<Field label={t('nameLang', { lang: 'en' })} htmlFor='c-en' error={err.nameEn?.message}>
+			<Field
+				label={t('nameLang', { lang: 'en' })}
+				htmlFor='c-en'
+				required
+				error={err.nameEn?.message}
+			>
 				<Input id='c-en' {...form.register('nameEn')} />
 			</Field>
 			<Field
@@ -239,8 +263,14 @@ function CategoryForm({
 					)}
 				/>
 			</Field>
-			<Field label={t('icon')} htmlFor='c-icon' error={err.icon?.message}>
-				<Input id='c-icon' {...form.register('icon')} placeholder='wrench' />
+			<Field label={t('icon')} error={err.icon?.message}>
+				<Controller
+					control={form.control}
+					name='icon'
+					render={({ field }) => (
+						<IconPicker value={field.value} onChange={field.onChange} invalid={Boolean(err.icon)} />
+					)}
+				/>
 			</Field>
 			<Field label={t('sortOrder')} htmlFor='c-sort' error={err.sortOrder?.message}>
 				<Input
@@ -252,7 +282,7 @@ function CategoryForm({
 					{...form.register('sortOrder', { setValueAs: toOptionalNumber })}
 				/>
 			</Field>
-			<Field label={t('status')} className='sm:col-span-2' hint={t('noDelete')}>
+			<Field label={t('status')} className='sm:col-span-2' hint={t('statusHint')}>
 				<Controller
 					control={form.control}
 					name='status'
@@ -272,6 +302,15 @@ function CategoryForm({
 					)}
 				/>
 			</Field>
+			{category?.id && (
+				<div className='sm:col-span-2'>
+					<CatalogMedia
+						kind='categories'
+						item={category}
+						onChange={c => setCustomIcon(Boolean(c.customIcon))}
+					/>
+				</div>
+			)}
 			<DialogFooter className='sm:col-span-2'>
 				<Button type='button' variant='secondary' onClick={() => onOpenChange(false)}>
 					{tc('cancel')}

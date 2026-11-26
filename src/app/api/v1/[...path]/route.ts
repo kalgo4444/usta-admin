@@ -2,6 +2,7 @@ import type { NextRequest } from 'next/server';
 import {
 	backendFetch,
 	gatewayError,
+	MAX_UPLOAD_BYTES,
 	passthrough,
 	problem,
 	readBodyLimited,
@@ -36,7 +37,10 @@ async function handler(req: NextRequest, ctx: RouteContext<'/api/v1/[...path]'>)
 	}
 
 	const hasBody = !['GET', 'HEAD'].includes(req.method);
-	const body = hasBody ? await readBodyLimited(req) : undefined;
+	const isUpload = req.headers.get('content-type')?.startsWith('multipart/form-data');
+	const body = hasBody
+		? await readBodyLimited(req, isUpload ? MAX_UPLOAD_BYTES : undefined)
+		: undefined;
 	if (body instanceof Response) return body;
 	try {
 		const res = await backendFetch(`/${joined}${req.nextUrl.search}`, {

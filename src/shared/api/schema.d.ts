@@ -34,7 +34,10 @@ export interface paths {
         };
         /** Mening usta profilim */
         get: operations["get"];
-        /** Profilni yaratish yoki yangilash */
+        /**
+         * ♻️ Profilni yaratish yoki yangilash
+         * @description **♻️ Oʻzgardi (2026-11-26):** `fullName` kamida 2 belgi. Tekshiruvga yuborilgan/tasdiqlangan ustada ism o'zgarmaydi (`409 IDENTITY_LOCKED`).
+         */
         put: operations["upsert_1"];
         post?: never;
         delete?: never;
@@ -51,7 +54,10 @@ export interface paths {
             cookie?: never;
         };
         get?: never;
-        /** Avatar yuklash (JPEG/PNG/WEBP, 5MB gacha) */
+        /**
+         * ♻️ Avatar yuklash (JPEG/PNG/WEBP, 5MB gacha)
+         * @description **♻️ Oʻzgardi (2026-11-26):** Tekshiruvga yuborilgan/tasdiqlangan ustada `409 IDENTITY_LOCKED`. Rasm metama'lumotlari o'chiriladi.
+         */
         put: operations["avatar"];
         post?: never;
         delete?: never;
@@ -72,7 +78,10 @@ export interface paths {
          * @description Profil hali yaratilmagan bo'lsa — 404 PROFILE_NOT_FOUND
          */
         get: operations["get_1"];
-        /** Profilni yaratish yoki yangilash */
+        /**
+         * ♻️ Profilni yaratish yoki yangilash
+         * @description **♻️ Oʻzgardi (2026-11-26):** `fullName` kamida 2 belgi.
+         */
         put: operations["upsert_2"];
         post?: never;
         delete?: never;
@@ -89,7 +98,10 @@ export interface paths {
             cookie?: never;
         };
         get?: never;
-        /** Avatar yuklash (JPEG/PNG/WEBP, 5MB gacha) */
+        /**
+         * ♻️ Avatar yuklash (JPEG/PNG/WEBP, 5MB gacha)
+         * @description **♻️ Oʻzgardi (2026-11-26):** Rasm tuzilishi tekshiriladi (`IMAGE_INVALID`), metama'lumotlari o'chiriladi.
+         */
         put: operations["avatar_1"];
         post?: never;
         delete?: never;
@@ -125,10 +137,83 @@ export interface paths {
             cookie?: never;
         };
         get?: never;
-        /** Xizmatni yangilash */
+        /**
+         * ♻️ Xizmatni yangilash
+         * @description **♻️ Oʻzgardi (2026-11-26):** `name` uch tilda majburiy; `icon` maydoni qo'shildi.
+         *
+         *     **Huquq:** `CATALOG`
+         */
         put: operations["updateService"];
         post?: never;
-        delete?: never;
+        /**
+         * 🆕 Xizmatni o'chirish
+         * @description **🆕 Yangi (2026-11-26):** O'chirish: ustalarning shu xizmatga narxlari ham o'chadi.
+         *
+         *     **Huquq:** `CATALOG` + `DELETE`
+         *
+         *     Ustalarning shu xizmatga narxlari ham o'chadi; eski buyurtmalar o'zgarmaydi
+         */
+        delete: operations["deleteService"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/catalog/services/{id}/image": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * 🆕 Xizmat rasmini yuklash
+         * @description **🆕 Yangi (2026-11-26):** Rasm yuklash.
+         *
+         *     **Huquq:** `CATALOG`
+         *
+         *     multipart, maydon: file. JPEG/PNG/WEBP, 5 MB gacha, 200–4096 px
+         */
+        put: operations["serviceImage"];
+        post?: never;
+        /**
+         * 🆕 Xizmat rasmini olib tashlash
+         * @description **🆕 Yangi (2026-11-26):** Rasmni olib tashlash.
+         *
+         *     **Huquq:** `CATALOG`
+         */
+        delete: operations["removeServiceImage"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/catalog/services/{id}/icon": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * 🆕 Xizmatga o'z ikonkasini yuklash
+         * @description **🆕 Yangi (2026-11-26):** O'z ikonkasi.
+         *
+         *     **Huquq:** `CATALOG`
+         *
+         *     multipart, maydon: file. Kvadrat PNG yoki WEBP (SVG qabul qilinmaydi), 512 KB gacha, 48–1024 px
+         */
+        put: operations["serviceIcon"];
+        post?: never;
+        /**
+         * 🆕 Yuklangan xizmat ikonkasini olib tashlash
+         * @description **🆕 Yangi (2026-11-26):** Yuklangan ikonkani olib tashlash.
+         *
+         *     **Huquq:** `CATALOG`
+         */
+        delete: operations["removeServiceIcon"];
         options?: never;
         head?: never;
         patch?: never;
@@ -142,10 +227,113 @@ export interface paths {
             cookie?: never;
         };
         get?: never;
-        /** Kategoriyani yangilash (ko'chirish, nomini o'zgartirish, faolsizlantirish) */
+        /**
+         * ♻️ Kategoriyani yangilash (ko'chirish, nomini o'zgartirish, faolsizlantirish)
+         * @description **♻️ Oʻzgardi (2026-11-26):** Uch til majburiy. `icon` berilsa yuklangan ikonka o'chadi; `null` bo'lsa yuklangani qoladi.
+         *
+         *     **Huquq:** `CATALOG`
+         */
         put: operations["updateCategory"];
         post?: never;
-        delete?: never;
+        /**
+         * 🆕 Kategoriyani o'chirish
+         * @description **🆕 Yangi (2026-11-26):** O'chirish (arxivlash). Ichi bo'sh bo'lmasa `409 CATEGORY_NOT_EMPTY` (`categories`, `services` sonlari bilan) — tasdiqlatib `?cascade=true`.
+         *
+         *     **Huquq:** `CATALOG` + `DELETE`
+         *
+         *     Ichida kategoriya yoki xizmat bo'lsa 409; ?cascade=true — butun shox xizmatlari bilan o'chadi
+         */
+        delete: operations["deleteCategory"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/catalog/categories/{id}/image": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * 🆕 Kategoriya rasmini yuklash
+         * @description **🆕 Yangi (2026-11-26):** Rasm yuklash. Xatolar: `IMAGE_INVALID`, `IMAGE_DIMENSIONS`, `FILE_TOO_LARGE`, `FILE_TYPE_NOT_ALLOWED`.
+         *
+         *     **Huquq:** `CATALOG`
+         *
+         *     multipart, maydon: file. JPEG/PNG/WEBP, 5 MB gacha, 200–4096 px
+         */
+        put: operations["categoryImage"];
+        post?: never;
+        /**
+         * 🆕 Kategoriya rasmini olib tashlash
+         * @description **🆕 Yangi (2026-11-26):** Rasmni olib tashlash.
+         *
+         *     **Huquq:** `CATALOG`
+         */
+        delete: operations["removeCategoryImage"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/catalog/categories/{id}/icon": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * 🆕 Kategoriyaga o'z ikonkasini yuklash
+         * @description **🆕 Yangi (2026-11-26):** O'z ikonkasi. Qo'shimcha xato: `IMAGE_NOT_SQUARE`.
+         *
+         *     **Huquq:** `CATALOG`
+         *
+         *     multipart, maydon: file. Kvadrat PNG yoki WEBP (SVG qabul qilinmaydi), 512 KB gacha, 48–1024 px
+         */
+        put: operations["categoryIcon"];
+        post?: never;
+        /**
+         * 🆕 Yuklangan kategoriya ikonkasini olib tashlash
+         * @description **🆕 Yangi (2026-11-26):** Yuklangan ikonkani olib tashlash.
+         *
+         *     **Huquq:** `CATALOG`
+         */
+        delete: operations["removeCategoryIcon"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/admins/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * 🆕 Huquqlarni almashtirish
+         * @description **🆕 Yangi (2026-11-26):** Huquqlarni to'liq almashtirish. Adminning eski tokeni darhol `401 TOKEN_OUTDATED` oladi.
+         *
+         *     **Huquq:** faqat `SUPER_ADMIN`
+         */
+        put: operations["update_1"];
+        post?: never;
+        /**
+         * 🆕 Adminlikni olib tashlash
+         * @description **🆕 Yangi (2026-11-26):** Adminlikni olib tashlash (mijoz/usta rollari qoladi).
+         *
+         *     **Huquq:** faqat `SUPER_ADMIN`
+         *
+         *     Boshqa rollari (mijoz/usta) qoladi
+         */
+        delete: operations["remove_1"];
         options?: never;
         head?: never;
         patch?: never;
@@ -161,8 +349,10 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * Push token ro'yxatdan o'tkazish (FCM)
-         * @description Ilova ishga tushganda va token yangilanganda chaqiriladi. Push tili — Accept-Language
+         * ♻️ Push token ro'yxatdan o'tkazish (FCM)
+         * @description **♻️ Oʻzgardi (2026-11-26):** Qurilma tili `Accept-Language` dan olinadi (`uz-Cyrl` ham).
+         *
+         *     Ilova ishga tushganda va token yangilanganda chaqiriladi. Push tili — Accept-Language
          */
         post: operations["register"];
         /** Push token o'chirish (chiqishda) */
@@ -197,13 +387,40 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * Xabarlar (yangilaridan eskilariga)
-         * @description Keyingi sahifa: ?before=<eng eski xabar id>
+         * ♻️ Xabarlar (yangilaridan eskilariga)
+         * @description **♻️ Oʻzgardi (2026-11-26):** `imageUrl` qo'shildi (rasmli xabarda `content` bo'sh bo'lishi mumkin). Chat har usta bilan alohida: usta almashsa tarix yangidan boshlanadi.
+         *
+         *     Keyingi sahifa: ?before=<eng eski xabar id>
          */
         get: operations["messages"];
         put?: never;
-        /** Xabar yuborish (WebSocket o'rniga REST) */
+        /**
+         * ♻️ Xabar yuborish (WebSocket o'rniga REST)
+         * @description **♻️ Oʻzgardi (2026-11-26):** Ko'rinmas va boshqaruv belgilari rad etiladi.
+         */
         post: operations["send"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/orders/{orderId}/chat/images": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * 🆕 Rasm yuborish
+         * @description **🆕 Yangi (2026-11-26):** Rasm (`file`) va ixtiyoriy izoh (`caption`). Javob va WebSocket hodisasida `imageUrl`. Xatolar: `CHAT_CLOSED`, `IMAGE_INVALID`, `FILE_TOO_LARGE`.
+         *
+         *     JPEG/PNG/WEBP, 10 MB gacha; izoh ixtiyoriy. Rasm metama'lumotlari (joylashuv va h.k.) o'chiriladi
+         */
+        post: operations["sendImage"];
         delete?: never;
         options?: never;
         head?: never;
@@ -387,8 +604,10 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * Ishni yakunlash (IN_PROGRESS -> COMPLETED -> COMMISSION)
-         * @description Yakuniy narx kiritiladi, platforma komissiyasi hisoblanadi
+         * ♻️ Ishni yakunlash (IN_PROGRESS -> COMPLETED -> COMMISSION)
+         * @description **♻️ Oʻzgardi (2026-11-26):** `price` kamida 1 (aks holda `400 VALIDATION_FAILED`).
+         *
+         *     Yakuniy narx kiritiladi, platforma komissiyasi hisoblanadi
          */
         post: operations["complete"];
         delete?: never;
@@ -406,7 +625,12 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Qabul qilingan buyurtmani bekor qilish (faqat ACCEPTED, sabab majburiy) */
+        /**
+         * ♻️ Qabul qilingan buyurtmadan voz kechish (faqat ACCEPTED, sabab majburiy)
+         * @description **♻️ Oʻzgardi (2026-11-26):** Buyurtma bekor bo'lmaydi — `SEARCHING` ga qaytadi; mijozga `ORDER_REOPENED` bildirishnomasi. Javobda mijoz ma'lumotlari va aniq manzil yo'q.
+         *
+         *     Buyurtma bekor bo'lmaydi: qayta qidiruvga (SEARCHING) o'tadi va boshqa ustalarga yuboriladi
+         */
         post: operations["cancel"];
         delete?: never;
         options?: never;
@@ -444,8 +668,10 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * Taklifni qabul qilish
-         * @description Birinchi qabul qilgan usta oladi; kech qolganlar 409 ORDER_ALREADY_TAKEN oladi
+         * ♻️ Taklifni qabul qilish
+         * @description **♻️ Oʻzgardi (2026-11-26):** Komissiya qarzi muddati o'tgan bo'lsa `403 MASTER_HAS_OVERDUE_DEBT`.
+         *
+         *     Birinchi qabul qilgan usta oladi; kech qolganlar 409 ORDER_ALREADY_TAKEN oladi
          */
         post: operations["accept"];
         delete?: never;
@@ -468,8 +694,10 @@ export interface paths {
         get: operations["list"];
         put?: never;
         /**
-         * Buyurtma yaratish
-         * @description Buyurtma darhol SEARCHING holatiga o'tadi va eng yaqin mos ustalarga (standart 5 ta) taklif yuboriladi; birinchi qabul qilgan usta oladi. 15 daqiqada hech kim qabul qilmasa — EXPIRED.
+         * ♻️ Buyurtma yaratish
+         * @description **♻️ Oʻzgardi (2026-11-26):** Soatiga 20 ta buyurtma (`429`). Rejalashtirilgan buyurtma vaqtidan 1 soat oldingacha qidiriladi.
+         *
+         *     Buyurtma darhol SEARCHING holatiga o'tadi va eng yaqin mos ustalarga (standart 5 ta) taklif yuboriladi; birinchi qabul qilgan usta oladi. 15 daqiqada hech kim qabul qilmasa — EXPIRED.
          */
         post: operations["create"];
         delete?: never;
@@ -608,8 +836,10 @@ export interface paths {
         get: operations["mine"];
         put?: never;
         /**
-         * Shikoyat yuborish
-         * @description Usta biriktirilgan buyurtma bo'yicha; ikkinchi tomonga nisbatan
+         * ♻️ Shikoyat yuborish
+         * @description **♻️ Oʻzgardi (2026-11-26):** Sutkasiga 10 ta shikoyat (`429`).
+         *
+         *     Usta biriktirilgan buyurtma bo'yicha; ikkinchi tomonga nisbatan
          */
         post: operations["file"];
         delete?: never;
@@ -628,8 +858,10 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * Access tokenni yangilash (refresh token rotatsiyasi)
-         * @description Har chaqiruvda yangi refresh token qaytadi, eskisi bekor bo'ladi. Eski token qayta ishlatilsa — shu qurilmaning barcha sessiyalari bekor qilinadi.
+         * ♻️ Access tokenni yangilash (refresh token rotatsiyasi)
+         * @description **♻️ Oʻzgardi (2026-11-26):** `TOKEN_OUTDATED` kelganda shu yerdan yangi huquqlar bilan token olinadi.
+         *
+         *     Har chaqiruvda yangi refresh token qaytadi, eskisi bekor bo'ladi. Eski token qayta ishlatilsa — shu qurilmaning barcha sessiyalari bekor qilinadi.
          */
         post: operations["refresh"];
         delete?: never;
@@ -648,8 +880,10 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * Kodni tasdiqlash va token olish
-         * @description Foydalanuvchi bo'lmasa — yaratiladi (newUser=true). Keyin rol tanlanadi: POST /api/v1/me/roles
+         * ♻️ Kodni tasdiqlash va token olish
+         * @description **♻️ Oʻzgardi (2026-11-26):** `user` ichida `permissions`. Sutkasiga 15 ta noto'g'ri kod; oshsa `429`.
+         *
+         *     Foydalanuvchi bo'lmasa — yaratiladi (newUser=true). Keyin rol tanlanadi: POST /api/v1/me/roles
          */
         post: operations["verifyOtp"];
         delete?: never;
@@ -668,8 +902,10 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * SMS orqali tasdiqlash kodini yuborish
-         * @description Qayta yuborish cooldown'i va raqam/IP bo'yicha limitlar bor (429 + Retry-After).
+         * ♻️ SMS orqali tasdiqlash kodini yuborish
+         * @description **♻️ Oʻzgardi (2026-11-26):** Bir raqamga sutkasiga 10 ta SMS; oshsa `429`.
+         *
+         *     Qayta yuborish cooldown'i va raqam/IP bo'yicha limitlar bor (429 + Retry-After).
          */
         post: operations["requestOtp"];
         delete?: never;
@@ -687,7 +923,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Chiqish (joriy sessiyani bekor qilish) */
+        /**
+         * ♻️ Chiqish (joriy sessiyani bekor qilish)
+         * @description **♻️ Oʻzgardi (2026-11-26):** `pushToken` yuboring — shu qurilmaga push to'xtaydi.
+         */
         post: operations["logout"];
         delete?: never;
         options?: never;
@@ -704,7 +943,12 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Blokdan chiqarish */
+        /**
+         * ♻️ Blokdan chiqarish
+         * @description **♻️ Oʻzgardi (2026-11-26):** Adminni faqat super admin blokdan chiqaradi.
+         *
+         *     **Huquq:** `USERS`
+         */
         post: operations["unblock"];
         delete?: never;
         options?: never;
@@ -722,8 +966,12 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * Bloklash
-         * @description Barcha refresh tokenlar bekor qilinadi. ADMIN'ni bloklab bo'lmaydi.
+         * ♻️ Bloklash
+         * @description **♻️ Oʻzgardi (2026-11-26):** Adminni faqat super admin bloklaydi (`ADMIN_REQUIRES_SUPER_ADMIN`); super adminni bloklab bo'lmaydi (`CANNOT_BLOCK_ADMIN`).
+         *
+         *     **Huquq:** `USERS`
+         *
+         *     Barcha refresh tokenlar bekor qilinadi. Adminni faqat super admin bloklaydi, super adminni hech kim.
          */
         post: operations["block"];
         delete?: never;
@@ -743,9 +991,35 @@ export interface paths {
         put?: never;
         /**
          * Indeksni to'liq qayta qurish
-         * @description Odatda kerak emas — indeks eventlar orqali yangilanadi
+         * @description **Huquq:** `SYSTEM`
+         *
+         *     Odatda kerak emas — indeks eventlar orqali yangilanadi
          */
         post: operations["reindex"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/outbox/dead/retry": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * 🆕 Hammasini qayta navbatga qo'yish
+         * @description **🆕 Yangi (2026-11-26):** Ularni qayta navbatga qo'yish.
+         *
+         *     **Huquq:** `SYSTEM`
+         *
+         *     Xato sababi bartaraf etilgandan keyin
+         */
+        post: operations["retry"];
         delete?: never;
         options?: never;
         head?: never;
@@ -761,7 +1035,12 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Nizoni hal qilish (DISPUTED -> COMPLETED|CANCELLED) */
+        /**
+         * ♻️ Nizoni hal qilish (DISPUTED -> COMPLETED|CANCELLED)
+         * @description **♻️ Oʻzgardi (2026-11-26):** `price` kamida 1.
+         *
+         *     **Huquq:** `ORDERS`
+         */
         post: operations["resolve"];
         delete?: never;
         options?: never;
@@ -780,7 +1059,9 @@ export interface paths {
         put?: never;
         /**
          * Rad etish (PENDING|APPROVED -> REJECTED)
-         * @description Sabab ustaga ko'rsatiladi
+         * @description **Huquq:** `MASTERS`
+         *
+         *     Sabab ustaga ko'rsatiladi
          */
         post: operations["reject_1"];
         delete?: never;
@@ -798,7 +1079,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Tasdiqlash (PENDING -> APPROVED) */
+        /**
+         * Tasdiqlash (PENDING -> APPROVED)
+         * @description **Huquq:** `MASTERS`
+         */
         post: operations["approve"];
         delete?: never;
         options?: never;
@@ -816,8 +1100,12 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * Ustaning komissiya to'lovini qabul qilish
-         * @description Summa yopilgan hafta (INVOICED) bo'yicha to'lanmagan summaga teng bo'lishi shart
+         * ♻️ Ustaning komissiya to'lovini qabul qilish
+         * @description **♻️ Oʻzgardi (2026-11-26):** `amount` = hisobdagi `due` (ortiqcha to'lov chegirilgan).
+         *
+         *     **Huquq:** `FINANCE`
+         *
+         *     Summa yopilgan hafta (INVOICED) bo'yicha to'lanmagan summaga teng bo'lishi shart
          */
         post: operations["settle"];
         delete?: never;
@@ -837,7 +1125,9 @@ export interface paths {
         put?: never;
         /**
          * Tugagan haftalarni hozir yopish
-         * @description Odatda avtomatik (har soat). Idempotent
+         * @description **Huquq:** `FINANCE`
+         *
+         *     Odatda avtomatik (har soat). Idempotent
          */
         post: operations["close"];
         delete?: never;
@@ -855,7 +1145,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Ko'rib chiqishga olish (OPEN -> IN_REVIEW) */
+        /**
+         * Ko'rib chiqishga olish (OPEN -> IN_REVIEW)
+         * @description **Huquq:** `COMPLAINTS`
+         */
         post: operations["take"];
         delete?: never;
         options?: never;
@@ -874,7 +1167,9 @@ export interface paths {
         put?: never;
         /**
          * Yopish (RESOLVED | REJECTED)
-         * @description Nizo ochiq bo'lsa — orderResolution bilan buyurtma bo'yicha ham qaror
+         * @description **Huquq:** `COMPLAINTS`
+         *
+         *     Nizo ochiq bo'lsa — orderResolution bilan buyurtma bo'yicha ham qaror
          */
         post: operations["close_1"];
         delete?: never;
@@ -891,12 +1186,21 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * Xizmatlar (nofaollari ham)
-         * @description ?categoryId= bo'yicha filtr
+         * ♻️ Xizmatlar (nofaollari ham)
+         * @description **♻️ Oʻzgardi (2026-11-26):** `icon`, `iconUrl`, `customIcon`, `imageUrl`, `uzCyrl`; o'chirilganlar chiqmaydi.
+         *
+         *     **Huquq:** `CATALOG`
+         *
+         *     ?categoryId= bo'yicha filtr
          */
         get: operations["services"];
         put?: never;
-        /** Xizmat yaratish */
+        /**
+         * ♻️ Xizmat yaratish
+         * @description **♻️ Oʻzgardi (2026-11-26):** `name` uch tilda majburiy; `icon` maydoni qo'shildi.
+         *
+         *     **Huquq:** `CATALOG`
+         */
         post: operations["createService"];
         delete?: never;
         options?: never;
@@ -911,11 +1215,51 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Barcha kategoriyalar (tekis ro'yxat, nofaollari ham) */
+        /**
+         * ♻️ Barcha kategoriyalar (tekis ro'yxat, nofaollari ham)
+         * @description **♻️ Oʻzgardi (2026-11-26):** `iconUrl`, `customIcon`, `imageUrl`, `name.uzCyrl`; o'chirilganlar chiqmaydi.
+         *
+         *     **Huquq:** `CATALOG`
+         */
         get: operations["categories"];
         put?: never;
-        /** Kategoriya yaratish */
+        /**
+         * ♻️ Kategoriya yaratish
+         * @description **♻️ Oʻzgardi (2026-11-26):** `name.uz`, `name.ru`, `name.en` majburiy (kamida 2 belgi); `icon` — to'plamdagi kalit (`UNKNOWN_ICON`).
+         *
+         *     **Huquq:** `CATALOG`
+         */
         post: operations["createCategory"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/admins": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 🆕 Adminlar ro'yxati (super adminlar bilan)
+         * @description **🆕 Yangi (2026-11-26):** Adminlar va ularning huquqlari.
+         *
+         *     **Huquq:** faqat `SUPER_ADMIN`
+         */
+        get: operations["admins"];
+        put?: never;
+        /**
+         * 🆕 Admin tayinlash
+         * @description **🆕 Yangi (2026-11-26):** Telefon bo'yicha admin tayinlash; `permissions` — kamida bittasi.
+         *
+         *     **Huquq:** faqat `SUPER_ADMIN`
+         *
+         *     Telefon bo'yicha; hisob bo'lmasa yaratiladi
+         */
+        post: operations["appoint"];
         delete?: never;
         options?: never;
         head?: never;
@@ -968,7 +1312,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Xizmatlarni nomi bo'yicha qidirish (uz/ru/en) */
+        /**
+         * ♻️ Xizmatlarni nomi bo'yicha qidirish (uz lotin/kirill, ru, en)
+         * @description **♻️ Oʻzgardi (2026-11-26):** Qidiruv o'zbek kirillida ham ishlaydi; tutuq belgisining turi farqlanmaydi.
+         */
         get: operations["search"];
         put?: never;
         post?: never;
@@ -985,8 +1332,51 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Xizmat */
+        /**
+         * ♻️ Xizmat
+         * @description **♻️ Oʻzgardi (2026-11-26):** `icon`, `iconUrl`, `imageUrl` qo'shildi.
+         */
         get: operations["service"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/public/catalog/icons": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 🆕 Tayyor ikonkalar to'plami (admin kategoriya/xizmatga tanlaydi)
+         * @description **🆕 Yangi (2026-11-26):** Tayyor ikonkalar: `key` ni kategoriya/xizmatning `icon` maydoniga yozing; `url` — SVG.
+         */
+        get: operations["icons"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/public/catalog/icons/{key}.svg": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 🆕 To'plam ikonkasi (SVG)
+         * @description **🆕 Yangi (2026-11-26):** Bir rangli chiziqli SVG (`currentColor`); keshlanadi.
+         */
+        get: operations["icon"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1002,7 +1392,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Faol kategoriyalar daraxti */
+        /**
+         * ♻️ Faol kategoriyalar daraxti
+         * @description **♻️ Oʻzgardi (2026-11-26):** `iconUrl`, `imageUrl` qo'shildi.
+         */
         get: operations["categories_1"];
         put?: never;
         post?: never;
@@ -1019,7 +1412,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Kategoriyadagi faol xizmatlar */
+        /**
+         * ♻️ Kategoriyadagi faol xizmatlar
+         * @description **♻️ Oʻzgardi (2026-11-26):** `icon`, `iconUrl`, `imageUrl` qo'shildi.
+         */
         get: operations["services_1"];
         put?: never;
         post?: never;
@@ -1053,7 +1449,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Bildirishnomalar (yangilari birinchi) */
+        /**
+         * ♻️ Bildirishnomalar (yangilari birinchi)
+         * @description **♻️ Oʻzgardi (2026-11-26):** Yangi tur: `ORDER_REOPENED`. Matn `uz-Cyrl` da ham.
+         */
         get: operations["list_2"];
         put?: never;
         post?: never;
@@ -1087,7 +1486,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Joriy foydalanuvchi ma'lumotlari */
+        /**
+         * ♻️ Joriy foydalanuvchi ma'lumotlari
+         * @description **♻️ Oʻzgardi (2026-11-26):** `permissions` maydoni qo'shildi; `roles` da `SUPER_ADMIN` bo'lishi mumkin.
+         */
         get: operations["me"];
         put?: never;
         post?: never;
@@ -1207,8 +1609,10 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * Buyurtma tafsilotlari
-         * @description Biriktirilgan yoki taklif yuborilgan buyurtma
+         * ♻️ Buyurtma tafsilotlari
+         * @description **♻️ Oʻzgardi (2026-11-26):** Rad etilgan, muddati o'tgan yoki boshqa usta olgan taklif buyurtmani ko'rsatmaydi (404).
+         *
+         *     Biriktirilgan yoki taklif yuborilgan buyurtma
          */
         get: operations["get_5"];
         put?: never;
@@ -1260,7 +1664,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Hisob holati: balans, to'lanishi kerak, joriy hafta */
+        /**
+         * ♻️ Hisob holati: balans, to'lanishi kerak, joriy hafta
+         * @description **♻️ Oʻzgardi (2026-11-26):** `overdue` qo'shildi — `true` bo'lsa ogohlantirish ko'rsating.
+         */
         get: operations["summary"];
         put?: never;
         post?: never;
@@ -1297,7 +1704,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Buyurtma tafsilotlari (status tarixi bilan) */
+        /**
+         * ♻️ Buyurtma tafsilotlari (status tarixi bilan)
+         * @description **♻️ Oʻzgardi (2026-11-26):** `estimatedPriceMin/Max` (faqat `SEARCHING`). Tizim sabablari (`history[].reason`, `cancelReason`) so'rov tilida.
+         */
         get: operations["get_6"];
         put?: never;
         post?: never;
@@ -1331,8 +1741,35 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Foydalanuvchilar ro'yxati (filtr: telefon qismi, rol, status) */
+        /**
+         * ♻️ Foydalanuvchilar ro'yxati (filtr: telefon qismi, rol, status)
+         * @description **♻️ Oʻzgardi (2026-11-26):** O'chirilganlar faqat `status=DELETED` so'ralganda chiqadi (`phone` bo'sh); `role=SUPER_ADMIN` qo'shildi.
+         *
+         *     **Huquq:** `USERS`
+         */
         get: operations["list_3"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/outbox/dead": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 🆕 Urinishlari tugagan eventlar (eng eskisidan)
+         * @description **🆕 Yangi (2026-11-26):** Yetkazilmay qolgan ichki eventlar.
+         *
+         *     **Huquq:** `SYSTEM`
+         */
+        get: operations["dead"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1350,7 +1787,9 @@ export interface paths {
         };
         /**
          * Buyurtmalar
-         * @description Nizolar navbati: ?status=DISPUTED&sort=updatedAt,asc
+         * @description **Huquq:** `ORDERS`
+         *
+         *     Nizolar navbati: ?status=DISPUTED&sort=updatedAt,asc
          */
         get: operations["list_4"];
         put?: never;
@@ -1368,7 +1807,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Admin: buyurtma chati (nizolarni ko'rib chiqish uchun) */
+        /**
+         * Admin: buyurtma chati (nizolarni ko'rib chiqish uchun)
+         * @description **Huquq:** `ORDERS` yoki `COMPLAINTS`
+         */
         get: operations["adminMessages"];
         put?: never;
         post?: never;
@@ -1385,7 +1827,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Buyurtma: tarix, takliflar, komissiya, mijoz ma'lumotlari */
+        /**
+         * Buyurtma: tarix, takliflar, komissiya, mijoz ma'lumotlari
+         * @description **Huquq:** `ORDERS`
+         */
         get: operations["get_8"];
         put?: never;
         post?: never;
@@ -1404,7 +1849,9 @@ export interface paths {
         };
         /**
          * Ustalar ro'yxati
-         * @description Tasdiqlash navbati: ?status=PENDING&sort=submittedAt,asc
+         * @description **Huquq:** `MASTERS`
+         *
+         *     Tasdiqlash navbati: ?status=PENDING&sort=submittedAt,asc
          */
         get: operations["list_5"];
         put?: never;
@@ -1422,7 +1869,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Usta tafsilotlari va hujjatlari (presigned URL bilan) */
+        /**
+         * Usta tafsilotlari va hujjatlari (presigned URL bilan)
+         * @description **Huquq:** `MASTERS`
+         */
         get: operations["get_9"];
         put?: never;
         post?: never;
@@ -1439,7 +1889,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Usta hisobi (ledger) */
+        /**
+         * Usta hisobi (ledger)
+         * @description **Huquq:** `FINANCE`
+         */
         get: operations["transactions_1"];
         put?: never;
         post?: never;
@@ -1458,7 +1911,9 @@ export interface paths {
         };
         /**
          * Solishtirish: buyurtma komissiyasi = komissiya hisoboti = ledger
-         * @description ?from=2026-11-01&to=2026-11-19 (to — kiritilmaydi). Standart: oxirgi 7 kun
+         * @description **Huquq:** `FINANCE`
+         *
+         *     ?from=2026-11-01&to=2026-11-19 (to — kiritilmaydi). Standart: oxirgi 7 kun
          */
         get: operations["reconcile"];
         put?: never;
@@ -1477,8 +1932,12 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * Hisob-fakturalar: usta × hafta bo'yicha yig'ma
-         * @description ?period=2026-11-16 yoki ?masterId=
+         * ♻️ Hisob-fakturalar: usta × hafta bo'yicha yig'ma
+         * @description **♻️ Oʻzgardi (2026-11-26):** `onHold`, `due` qo'shildi.
+         *
+         *     **Huquq:** `FINANCE`
+         *
+         *     ?period=2026-11-16 yoki ?masterId=
          */
         get: operations["invoices"];
         put?: never;
@@ -1496,7 +1955,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Komissiyalar (buyurtmalar bo'yicha) */
+        /**
+         * Komissiyalar (buyurtmalar bo'yicha)
+         * @description **Huquq:** `FINANCE`
+         */
         get: operations["commissions_1"];
         put?: never;
         post?: never;
@@ -1515,7 +1977,9 @@ export interface paths {
         };
         /**
          * Shikoyatlar
-         * @description Navbat: ?status=OPEN&sort=createdAt,asc
+         * @description **Huquq:** `COMPLAINTS`
+         *
+         *     Navbat: ?status=OPEN&sort=createdAt,asc
          */
         get: operations["list_6"];
         put?: never;
@@ -1535,9 +1999,33 @@ export interface paths {
         };
         /**
          * Shikoyat tafsilotlari
-         * @description Buyurtma chati: GET /api/v1/admin/orders/{orderId}/chat/messages
+         * @description **Huquq:** `COMPLAINTS`
+         *
+         *     Buyurtma chati: GET /api/v1/admin/orders/{orderId}/chat/messages
          */
         get: operations["adminGet"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/admins/permissions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 🆕 Beriladigan huquqlar ro'yxati (nomi so'rov tilida)
+         * @description **🆕 Yangi (2026-11-26):** Huquqlar ro'yxati, nomi `Accept-Language` tilida.
+         *
+         *     **Huquq:** faqat `SUPER_ADMIN`
+         */
+        get: operations["permissions"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1609,6 +2097,30 @@ export interface paths {
         post?: never;
         /** Biriktirmani o'chirish */
         delete: operations["detach"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/users/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * 🆕 Hisobni o'chirish (USERS va DELETE huquqlari)
+         * @description **🆕 Yangi (2026-11-26):** Hisobni anonimlashtirish (qaytarib bo'lmaydi). 409: `USER_HAS_ACTIVE_ORDERS`, `USER_HAS_DEBT`, `CANNOT_DELETE_SELF`, `SUPER_ADMIN_IMMUTABLE`, `USER_DELETED`; 403: `ADMIN_REQUIRES_SUPER_ADMIN`.
+         *
+         *     **Huquq:** `USERS` + `DELETE`
+         *
+         *     Qaytarib bo'lmaydi: telefon, ism, manzillar, hujjat va rasmlar o'chiriladi; buyurtma va komissiya tarixi egasiz saqlanadi. Boshlangan ishi yoki komissiya qarzi bo'lsa — 409
+         */
+        delete: operations["delete_1"];
         options?: never;
         head?: never;
         patch?: never;
@@ -1740,15 +2252,18 @@ export interface components {
             uz?: string;
             ru?: string;
             en?: string;
+            uzCyrl?: string;
         };
-        /** @description Ko'p tilli nom: uz majburiy, ru/en ixtiyoriy */
+        /** @description Ko'p tilli nom: uz, ru, en majburiy; uzCyrl bo'sh bo'lsa lotinchadan o'giriladi */
         NameDto: {
             /** @example Santexnika */
             uz: string;
             /** @example Сантехника */
-            ru?: string;
+            ru: string;
             /** @example Plumbing */
-            en?: string;
+            en: string;
+            /** @example Сантехника */
+            uzCyrl?: string;
         };
         ServiceRequest: {
             /** Format: uuid */
@@ -1757,6 +2272,11 @@ export interface components {
             slug: string;
             name: components["schemas"]["NameDto"];
             description?: components["schemas"]["DescriptionDto"];
+            /**
+             * @description CategoryRequest.icon kabi
+             * @example toilet
+             */
+            icon?: string;
             /** Format: int32 */
             sortOrder?: number;
             /** @enum {string} */
@@ -1766,6 +2286,7 @@ export interface components {
             uz?: string;
             ru?: string;
             en?: string;
+            uzCyrl?: string;
         };
         ServiceAdminResponse: {
             /** Format: uuid */
@@ -1775,6 +2296,14 @@ export interface components {
             slug?: string;
             name?: components["schemas"]["LocalizedText"];
             description?: components["schemas"]["LocalizedText"];
+            /** @description To'plamdagi ikonka kaliti; yuklangan ikonkada null */
+            icon?: string;
+            /** @description Yuklangan ikonkaning vaqtinchalik havolasi yoki to'plam SVG'sining nisbiy yo'li */
+            iconUrl?: string;
+            /** @description Ikonka admin yuklagan faylmi */
+            customIcon?: boolean;
+            /** @description Rasmning vaqtinchalik (15 daq) havolasi */
+            imageUrl?: string;
             /** Format: int32 */
             sortOrder?: number;
             /** @enum {string} */
@@ -1793,7 +2322,10 @@ export interface components {
             /** @example plumbing */
             slug: string;
             name: components["schemas"]["NameDto"];
-            /** @example plumbing */
+            /**
+             * @description GET /public/catalog/icons dagi kalit; yuklangan ikonkani almashtiradi. null — yuklangan ikonka o'zgarmaydi
+             * @example plumbing
+             */
             icon?: string;
             /**
              * Format: int32
@@ -1813,7 +2345,14 @@ export interface components {
             parentId?: string;
             slug?: string;
             name?: components["schemas"]["LocalizedText"];
+            /** @description To'plamdagi ikonka kaliti; yuklangan ikonkada null */
             icon?: string;
+            /** @description Yuklangan ikonkaning vaqtinchalik havolasi yoki to'plam SVG'sining nisbiy yo'li */
+            iconUrl?: string;
+            /** @description Ikonka admin yuklagan faylmi */
+            customIcon?: boolean;
+            /** @description Rasmning vaqtinchalik (15 daq) havolasi */
+            imageUrl?: string;
             /** Format: int32 */
             sortOrder?: number;
             /** @enum {string} */
@@ -1822,6 +2361,22 @@ export interface components {
             createdAt?: string;
             /** Format: date-time */
             updatedAt?: string;
+        };
+        PermissionsRequest: {
+            permissions: ("USERS" | "MASTERS" | "CATALOG" | "ORDERS" | "FINANCE" | "COMPLAINTS" | "SYSTEM" | "DELETE")[];
+        };
+        AdminResponse: {
+            /** Format: uuid */
+            id?: string;
+            phone?: string;
+            superAdmin?: boolean;
+            permissions?: ("USERS" | "MASTERS" | "CATALOG" | "ORDERS" | "FINANCE" | "COMPLAINTS" | "SYSTEM" | "DELETE")[];
+            /** @enum {string} */
+            status?: "ACTIVE" | "BLOCKED" | "DELETED";
+            /** Format: date-time */
+            lastLoginAt?: string;
+            /** Format: date-time */
+            createdAt?: string;
         };
         PushTokenRequest: {
             token: string;
@@ -1838,7 +2393,10 @@ export interface components {
             orderId?: string;
             /** Format: uuid */
             senderId?: string;
+            /** @description Matn yoki rasm izohi; izohsiz rasmda bo'sh satr */
             content?: string;
+            /** @description Rasmli xabarda 15 daqiqalik havola, aks holda null */
+            imageUrl?: string | null;
             /** Format: date-time */
             createdAt?: string;
         };
@@ -1853,13 +2411,15 @@ export interface components {
             accessTokenExpiresAt?: string;
             user?: components["schemas"]["UserResponse"];
         };
+        /** @description permissions — admin huquqlari (admin bo'lmaganda bo'sh, super adminda hammasi) */
         UserResponse: {
             /** Format: uuid */
             id?: string;
             phone?: string;
-            roles?: ("CUSTOMER" | "MASTER" | "ADMIN")[];
+            roles?: ("CUSTOMER" | "MASTER" | "ADMIN" | "SUPER_ADMIN")[];
+            permissions?: ("USERS" | "MASTERS" | "CATALOG" | "ORDERS" | "FINANCE" | "COMPLAINTS" | "SYSTEM" | "DELETE")[];
             /** @enum {string} */
-            status?: "ACTIVE" | "BLOCKED";
+            status?: "ACTIVE" | "BLOCKED" | "DELETED";
             /** Format: date-time */
             createdAt?: string;
         };
@@ -1940,7 +2500,7 @@ export interface components {
         };
         CompleteRequest: {
             /**
-             * @description Yakuniy narx, UZS
+             * @description Yakuniy narx, UZS (musbat)
              * @example 180000
              */
             price: number;
@@ -1993,7 +2553,7 @@ export interface components {
             ratingCount?: number;
             phone?: string;
         };
-        /** @description Mijoz uchun buyurtma. priceFrom — qabul qilgan ustaning "narx dan" qiymati, price — yakuniy narx */
+        /** @description Mijoz uchun buyurtma. estimatedPriceMin/Max — faqat qidiruv paytida (SEARCHING): taklif yuborilgan ustalarning "narx dan" oralig'i (usta topilmaguncha bo'sh bo'lishi mumkin). priceFrom — qabul qilgan ustaning "narx dan" qiymati, price — yakuniy narx */
         OrderResponse: {
             /** Format: uuid */
             id?: string;
@@ -2008,6 +2568,8 @@ export interface components {
             scheduledAt?: string;
             /** Format: date-time */
             searchDeadline?: string;
+            estimatedPriceMin?: number;
+            estimatedPriceMax?: number;
             priceFrom?: number;
             price?: number;
             master?: components["schemas"]["MasterBrief"];
@@ -2117,13 +2679,18 @@ export interface components {
             /** Format: int32 */
             codeLength?: number;
         };
+        LogoutRequest: {
+            refreshToken: string;
+            /** @description Ixtiyoriy: shu qurilmaning push tokeni — o'chiriladi */
+            pushToken?: string;
+        };
         AdminUserResponse: {
             /** Format: uuid */
             id?: string;
             phone?: string;
-            roles?: ("CUSTOMER" | "MASTER" | "ADMIN")[];
+            roles?: ("CUSTOMER" | "MASTER" | "ADMIN" | "SUPER_ADMIN")[];
             /** @enum {string} */
-            status?: "ACTIVE" | "BLOCKED";
+            status?: "ACTIVE" | "BLOCKED" | "DELETED";
             blockedReason?: string;
             /** Format: date-time */
             lastLoginAt?: string;
@@ -2211,6 +2778,18 @@ export interface components {
             /** @description orderResolution=COMPLETED va narx kiritilmagan bo'lsa */
             price?: number;
         };
+        AppointAdminRequest: {
+            /** @example +998901234567 */
+            phone: string;
+            /**
+             * @description DELETE — o'chirish uchun qo'shimcha huquq, bo'lim huquqi bilan birga beriladi
+             * @example [
+             *       "CATALOG",
+             *       "DELETE"
+             *     ]
+             */
+            permissions: ("USERS" | "MASTERS" | "CATALOG" | "ORDERS" | "FINANCE" | "COMPLAINTS" | "SYSTEM" | "DELETE")[];
+        };
         /** @description Qidiruv natijasi. priceFrom — so'ralgan xizmat(lar) bo'yicha ustaning eng past "narx dan" qiymati */
         MasterSearchItem: {
             /** Format: uuid */
@@ -2253,6 +2832,17 @@ export interface components {
             slug?: string;
             name?: string;
             description?: string;
+            icon?: string;
+            /** @description Yuklangan ikonkaning vaqtinchalik havolasi yoki to'plam SVG'sining nisbiy yo'li */
+            iconUrl?: string;
+            /** @description Rasmning vaqtinchalik (15 daq) havolasi */
+            imageUrl?: string;
+        };
+        /** @description Tayyor to'plamdagi ikonka; url — SVG fayl */
+        IconResponse: {
+            key?: string;
+            name?: string;
+            url?: string;
         };
         /** @description Kategoriya daraxti tuguni; name — Accept-Language bo'yicha */
         CategoryTreeResponse: {
@@ -2260,7 +2850,12 @@ export interface components {
             id?: string;
             slug?: string;
             name?: string;
+            /** @description To'plamdagi ikonka kaliti */
             icon?: string;
+            /** @description Yuklangan ikonkaning vaqtinchalik havolasi yoki to'plam SVG'sining nisbiy yo'li */
+            iconUrl?: string;
+            /** @description Rasmning vaqtinchalik (15 daq) havolasi */
+            imageUrl?: string;
             children?: components["schemas"]["CategoryTreeResponse"][];
         };
         ChatInfo: {
@@ -2279,7 +2874,7 @@ export interface components {
             /** Format: uuid */
             id?: string;
             /** @enum {string} */
-            type?: "NEW_OFFER" | "ORDER_ACCEPTED" | "ORDER_STARTED" | "ORDER_COMPLETED" | "ORDER_CANCELLED" | "ORDER_EXPIRED" | "ORDER_DISPUTED" | "DISPUTE_RESOLVED" | "NEW_REVIEW" | "COMMISSION_INVOICED" | "COMMISSION_SETTLED" | "CHAT_MESSAGE" | "COMPLAINT_RESOLVED" | "COMPLAINT_REJECTED";
+            type?: "NEW_OFFER" | "ORDER_ACCEPTED" | "ORDER_REOPENED" | "ORDER_STARTED" | "ORDER_COMPLETED" | "ORDER_CANCELLED" | "ORDER_EXPIRED" | "ORDER_DISPUTED" | "DISPUTE_RESOLVED" | "NEW_REVIEW" | "COMMISSION_INVOICED" | "COMMISSION_SETTLED" | "CHAT_MESSAGE" | "COMPLAINT_RESOLVED" | "COMPLAINT_REJECTED";
             title?: string;
             body?: string;
             data?: {
@@ -2419,13 +3014,14 @@ export interface components {
             /** Format: date-time */
             createdAt?: string;
         };
-        /** @description balance < 0 — platformaga qarz (UZS). invoicedDue — yopilgan haftalar bo'yicha to'lanishi kerak, accrued — joriy haftada yig'ilayotgan komissiya */
+        /** @description balance < 0 — platformaga qarz (UZS). invoicedDue — yopilgan haftalar bo'yicha to'lanishi kerak, accrued — joriy haftada yig'ilayotgan komissiya, overdue — to'lov muddati o'tgan: yangi takliflar kelmaydi va qabul qilib bo'lmaydi */
         SummaryResponse: {
             balance?: number;
             invoicedDue?: number;
             accrued?: number;
             /** Format: date */
             currentPeriod?: string;
+            overdue?: boolean;
             currency?: string;
         };
         CommissionResponse: {
@@ -2482,6 +3078,19 @@ export interface components {
             /** Format: int32 */
             totalPages?: number;
         };
+        DeadEvent: {
+            /** Format: uuid */
+            id?: string;
+            aggregateType?: string;
+            /** Format: uuid */
+            aggregateId?: string;
+            eventType?: string;
+            /** Format: int32 */
+            attempts?: number;
+            lastError?: string;
+            /** Format: date-time */
+            createdAt?: string;
+        };
         AdminMasterResponse: {
             phone?: string;
             profile?: components["schemas"]["MasterProfileResponse"];
@@ -2533,10 +3142,64 @@ export interface components {
             /** Format: int32 */
             orders?: number;
             accrued?: number;
+            /** @description Yopilgan, to'lanmagan komissiya (nizodagilarsiz) */
             invoiced?: number;
             paid?: number;
+            /** @description Nizo hal bo'lguncha kutayotgan komissiya */
+            onHold?: number;
+            /** @description To'lov qabul qilishda kiritiladigan summa (ortiqcha to'lov chegirilgan) */
+            due?: number;
             /** Format: date */
             dueDate?: string;
+        };
+        PermissionResponse: {
+            /** @enum {string} */
+            code?: "USERS" | "MASTERS" | "CATALOG" | "ORDERS" | "FINANCE" | "COMPLAINTS" | "SYSTEM" | "DELETE";
+            name?: string;
+        };
+        Problem: {
+            /** @example urn:usta:error:validation_failed */
+            type?: string;
+            title: string;
+            /** @example 400 */
+            status: number;
+            /** @description Foydalanuvchiga ko'rsatiladigan matn (so'rov tilida) */
+            detail?: string;
+            instance?: string;
+            /**
+             * @description Barqaror xato kodi — ilova shunga tayanadi
+             * @example VALIDATION_FAILED
+             * @enum {string}
+             */
+            code: "SLUG_TAKEN" | "CATEGORY_CYCLE" | "CATEGORY_DEPTH_EXCEEDED" | "SERVICE_NOT_AVAILABLE" | "MASTER_SERVICE_LIMIT_EXCEEDED" | "PORTFOLIO_LIMIT_EXCEEDED" | "CATEGORY_NOT_EMPTY" | "UNKNOWN_ICON" | "CHAT_NOT_AVAILABLE" | "CHAT_CLOSED" | "ALREADY_OPEN" | "NOT_ALLOWED" | "INVALID_STATE" | "ORDER_RESOLUTION_REQUIRED" | "INVALID_PHONE_NUMBER" | "OTP_RESEND_TOO_EARLY" | "OTP_EXPIRED" | "OTP_INVALID" | "OTP_ATTEMPTS_EXCEEDED" | "SMS_SEND_FAILED" | "INVALID_REFRESH_TOKEN" | "REFRESH_TOKEN_REUSED" | "USER_BLOCKED" | "ROLE_NOT_SELECTABLE" | "CANNOT_BLOCK_ADMIN" | "ADMIN_REQUIRES_SUPER_ADMIN" | "SUPER_ADMIN_IMMUTABLE" | "CANNOT_DELETE_SELF" | "USER_DELETED" | "CANNOT_APPOINT_BLOCKED" | "INVALID_STATUS_TRANSITION" | "ORDER_ALREADY_TAKEN" | "OFFER_NOT_AVAILABLE" | "MASTER_NOT_AVAILABLE" | "MASTER_NOT_ACTIVE" | "CANNOT_ORDER_FROM_SELF" | "ADDRESS_REQUIRED" | "INVALID_SCHEDULE" | "ORDER_NOT_EDITABLE" | "ATTACHMENT_LIMIT_EXCEEDED" | "ORDER_NOT_REVIEWABLE" | "PRICE_REQUIRED" | "PRICE_NOT_POSITIVE" | "MASTER_HAS_OVERDUE_DEBT" | "USER_HAS_ACTIVE_ORDERS" | "NOTHING_TO_SETTLE" | "AMOUNT_MISMATCH" | "INVALID_PERIOD" | "USER_HAS_DEBT" | "PROFILE_NOT_FOUND" | "MASTER_PROFILE_REQUIRED" | "VERIFICATION_INVALID_STATE" | "VERIFICATION_MISSING_DOCUMENTS" | "VERIFICATION_WORK_AREA_REQUIRED" | "DOCUMENTS_LOCKED" | "DOCUMENT_LIMIT_EXCEEDED" | "ADDRESS_LIMIT_EXCEEDED" | "IDENTITY_LOCKED" | "ALREADY_REVIEWED" | "TARGET_REQUIRED" | "LOCATION_REQUIRED" | "INVALID_PRICE_RANGE" | "VALIDATION_FAILED" | "MALFORMED_REQUEST" | "BAD_REQUEST" | "UNAUTHORIZED" | "ACCESS_DENIED" | "TOKEN_OUTDATED" | "NOT_FOUND" | "RESOURCE_NOT_FOUND" | "METHOD_NOT_ALLOWED" | "NOT_ACCEPTABLE" | "UNSUPPORTED_MEDIA_TYPE" | "PAYLOAD_TOO_LARGE" | "CONFLICT" | "CONCURRENT_MODIFICATION" | "TOO_MANY_REQUESTS" | "SERVICE_UNAVAILABLE" | "INTERNAL_ERROR" | "FILE_EMPTY" | "FILE_TOO_LARGE" | "FILE_TYPE_NOT_ALLOWED" | "IMAGE_INVALID" | "IMAGE_DIMENSIONS" | "IMAGE_NOT_SQUARE" | "STORAGE_UNAVAILABLE";
+            /** @description Qo'llab-quvvatlashga yuboriladi */
+            traceId?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            /** @description Faqat VALIDATION_FAILED: maydon xatolari */
+            errors?: {
+                field?: string;
+                message?: string;
+            }[];
+            /** @description 429 da: necha soniyadan so'ng */
+            retryAfterSeconds?: number;
+        };
+        /** @description WebSocket hodisasi (/topic/orders.{orderId}.chat) */
+        ChatEvent: {
+            /** @enum {string} */
+            type?: "MESSAGE" | "READ";
+            /** @description type=MESSAGE da to'ldiriladi */
+            message?: components["schemas"]["MessageView"];
+            /**
+             * Format: uuid
+             * @description type=READ: kim o'qidi
+             */
+            readerId?: string;
+            /**
+             * Format: date-time
+             * @description type=READ: qaysi vaqtgacha o'qidi
+             */
+            readAt?: string;
         };
     };
     responses: never;
@@ -2550,7 +3213,10 @@ export interface operations {
     upsert: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path: {
                 serviceId: string;
             };
@@ -2571,12 +3237,24 @@ export interface operations {
                     "application/json": components["schemas"]["MasterServiceResponse"];
                 };
             };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
         };
     };
     remove: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path: {
                 serviceId: string;
             };
@@ -2591,12 +3269,24 @@ export interface operations {
                 };
                 content?: never;
             };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
         };
     };
     get: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path?: never;
             cookie?: never;
         };
@@ -2611,12 +3301,24 @@ export interface operations {
                     "application/json": components["schemas"]["MasterProfileResponse"];
                 };
             };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
         };
     };
     upsert_1: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path?: never;
             cookie?: never;
         };
@@ -2635,12 +3337,24 @@ export interface operations {
                     "application/json": components["schemas"]["MasterProfileResponse"];
                 };
             };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
         };
     };
     avatar: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path?: never;
             cookie?: never;
         };
@@ -2662,12 +3376,24 @@ export interface operations {
                     "application/json": components["schemas"]["MasterProfileResponse"];
                 };
             };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
         };
     };
     get_1: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path?: never;
             cookie?: never;
         };
@@ -2682,12 +3408,24 @@ export interface operations {
                     "application/json": components["schemas"]["CustomerProfileResponse"];
                 };
             };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
         };
     };
     upsert_2: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path?: never;
             cookie?: never;
         };
@@ -2706,12 +3444,24 @@ export interface operations {
                     "application/json": components["schemas"]["CustomerProfileResponse"];
                 };
             };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
         };
     };
     avatar_1: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path?: never;
             cookie?: never;
         };
@@ -2733,12 +3483,24 @@ export interface operations {
                     "application/json": components["schemas"]["CustomerProfileResponse"];
                 };
             };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
         };
     };
     get_2: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path: {
                 id: string;
             };
@@ -2755,12 +3517,24 @@ export interface operations {
                     "application/json": components["schemas"]["AddressResponse"];
                 };
             };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
         };
     };
     update: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path: {
                 id: string;
             };
@@ -2781,12 +3555,24 @@ export interface operations {
                     "application/json": components["schemas"]["AddressResponse"];
                 };
             };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
         };
     };
     delete: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path: {
                 id: string;
             };
@@ -2801,12 +3587,24 @@ export interface operations {
                 };
                 content?: never;
             };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
         };
     };
     updateService: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path: {
                 id: string;
             };
@@ -2827,12 +3625,206 @@ export interface operations {
                     "application/json": components["schemas"]["ServiceAdminResponse"];
                 };
             };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    deleteService: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    serviceImage: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "multipart/form-data": {
+                    /** Format: binary */
+                    file: string;
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ServiceAdminResponse"];
+                };
+            };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    removeServiceImage: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ServiceAdminResponse"];
+                };
+            };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    serviceIcon: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "multipart/form-data": {
+                    /** Format: binary */
+                    file: string;
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ServiceAdminResponse"];
+                };
+            };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    removeServiceIcon: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ServiceAdminResponse"];
+                };
+            };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
         };
     };
     updateCategory: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path: {
                 id: string;
             };
@@ -2853,12 +3845,278 @@ export interface operations {
                     "application/json": components["schemas"]["CategoryAdminResponse"];
                 };
             };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    deleteCategory: {
+        parameters: {
+            query?: {
+                cascade?: boolean;
+            };
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    categoryImage: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "multipart/form-data": {
+                    /** Format: binary */
+                    file: string;
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CategoryAdminResponse"];
+                };
+            };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    removeCategoryImage: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CategoryAdminResponse"];
+                };
+            };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    categoryIcon: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "multipart/form-data": {
+                    /** Format: binary */
+                    file: string;
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CategoryAdminResponse"];
+                };
+            };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    removeCategoryIcon: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CategoryAdminResponse"];
+                };
+            };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    update_1: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PermissionsRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminResponse"];
+                };
+            };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    remove_1: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
         };
     };
     register: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path?: never;
             cookie?: never;
         };
@@ -2875,6 +4133,15 @@ export interface operations {
                 };
                 content?: never;
             };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
         };
     };
     unregister: {
@@ -2882,7 +4149,10 @@ export interface operations {
             query: {
                 token: string;
             };
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path?: never;
             cookie?: never;
         };
@@ -2895,12 +4165,24 @@ export interface operations {
                 };
                 content?: never;
             };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
         };
     };
     read: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path: {
                 orderId: string;
             };
@@ -2915,6 +4197,15 @@ export interface operations {
                 };
                 content?: never;
             };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
         };
     };
     messages: {
@@ -2923,7 +4214,10 @@ export interface operations {
                 before?: string;
                 limit?: number;
             };
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path: {
                 orderId: string;
             };
@@ -2940,12 +4234,24 @@ export interface operations {
                     "application/json": components["schemas"]["MessageView"][];
                 };
             };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
         };
     };
     send: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path: {
                 orderId: string;
             };
@@ -2966,12 +4272,66 @@ export interface operations {
                     "application/json": components["schemas"]["MessageView"];
                 };
             };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    sendImage: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
+            path: {
+                orderId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "multipart/form-data": {
+                    /** Format: binary */
+                    file: string;
+                    caption?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MessageView"];
+                };
+            };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
         };
     };
     read_1: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path: {
                 id: string;
             };
@@ -2986,12 +4346,24 @@ export interface operations {
                 };
                 content?: never;
             };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
         };
     };
     readAll: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path?: never;
             cookie?: never;
         };
@@ -3008,12 +4380,24 @@ export interface operations {
                     };
                 };
             };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
         };
     };
     selectRole: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path?: never;
             cookie?: never;
         };
@@ -3032,12 +4416,24 @@ export interface operations {
                     "application/json": components["schemas"]["AccessTokenResponse"];
                 };
             };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
         };
     };
     submit: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path?: never;
             cookie?: never;
         };
@@ -3052,12 +4448,24 @@ export interface operations {
                     "application/json": components["schemas"]["MasterProfileResponse"];
                 };
             };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
         };
     };
     documents: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path?: never;
             cookie?: never;
         };
@@ -3072,14 +4480,24 @@ export interface operations {
                     "application/json": components["schemas"]["DocumentResponse"][];
                 };
             };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
         };
     };
     upload: {
         parameters: {
-            query: {
-                type: "PASSPORT" | "SELFIE" | "CERTIFICATE" | "OTHER";
+            query?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
             };
-            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -3088,6 +4506,8 @@ export interface operations {
                 "multipart/form-data": {
                     /** Format: binary */
                     file: string;
+                    /** @enum {string} */
+                    type: "PASSPORT" | "SELFIE" | "CERTIFICATE" | "OTHER";
                 };
             };
         };
@@ -3101,12 +4521,24 @@ export interface operations {
                     "application/json": components["schemas"]["DocumentResponse"];
                 };
             };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
         };
     };
     heartbeat: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path?: never;
             cookie?: never;
         };
@@ -3119,12 +4551,24 @@ export interface operations {
                 };
                 content?: never;
             };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
         };
     };
     portfolio: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path?: never;
             cookie?: never;
         };
@@ -3139,14 +4583,24 @@ export interface operations {
                     "application/json": components["schemas"]["PortfolioItemResponse"][];
                 };
             };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
         };
     };
     addPortfolio: {
         parameters: {
-            query?: {
-                description?: string;
+            query?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
             };
-            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -3155,6 +4609,7 @@ export interface operations {
                 "multipart/form-data": {
                     /** Format: binary */
                     file: string;
+                    description?: string;
                 };
             };
         };
@@ -3168,12 +4623,24 @@ export interface operations {
                     "application/json": components["schemas"]["PortfolioItemResponse"];
                 };
             };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
         };
     };
     start: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path: {
                 id: string;
             };
@@ -3190,12 +4657,24 @@ export interface operations {
                     "application/json": components["schemas"]["MasterOrderResponse"];
                 };
             };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
         };
     };
     dispute: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path: {
                 id: string;
             };
@@ -3216,12 +4695,24 @@ export interface operations {
                     "application/json": components["schemas"]["MasterOrderResponse"];
                 };
             };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
         };
     };
     complete: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path: {
                 id: string;
             };
@@ -3242,12 +4733,24 @@ export interface operations {
                     "application/json": components["schemas"]["MasterOrderResponse"];
                 };
             };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
         };
     };
     cancel: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path: {
                 id: string;
             };
@@ -3268,12 +4771,24 @@ export interface operations {
                     "application/json": components["schemas"]["MasterOrderResponse"];
                 };
             };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
         };
     };
     reject: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path: {
                 orderId: string;
             };
@@ -3288,12 +4803,24 @@ export interface operations {
                 };
                 content?: never;
             };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
         };
     };
     accept: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path: {
                 orderId: string;
             };
@@ -3310,6 +4837,15 @@ export interface operations {
                     "application/json": components["schemas"]["MasterOrderResponse"];
                 };
             };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
         };
     };
     list: {
@@ -3323,7 +4859,10 @@ export interface operations {
                 /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
                 sort?: string[];
             };
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path?: never;
             cookie?: never;
         };
@@ -3338,12 +4877,24 @@ export interface operations {
                     "application/json": components["schemas"]["PageResponseOrderSummary"];
                 };
             };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
         };
     };
     create: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path?: never;
             cookie?: never;
         };
@@ -3362,12 +4913,24 @@ export interface operations {
                     "application/json": components["schemas"]["OrderResponse"];
                 };
             };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
         };
     };
     get_3: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path: {
                 orderId: string;
             };
@@ -3384,12 +4947,24 @@ export interface operations {
                     "application/json": components["schemas"]["ReviewResponse"];
                 };
             };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
         };
     };
     create_1: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path: {
                 orderId: string;
             };
@@ -3410,12 +4985,24 @@ export interface operations {
                     "application/json": components["schemas"]["ReviewResponse"];
                 };
             };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
         };
     };
     dispute_1: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path: {
                 id: string;
             };
@@ -3436,12 +5023,24 @@ export interface operations {
                     "application/json": components["schemas"]["OrderResponse"];
                 };
             };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
         };
     };
     cancel_1: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path: {
                 id: string;
             };
@@ -3462,12 +5061,24 @@ export interface operations {
                     "application/json": components["schemas"]["OrderResponse"];
                 };
             };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
         };
     };
     attach: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path: {
                 id: string;
             };
@@ -3491,12 +5102,24 @@ export interface operations {
                     "application/json": components["schemas"]["AttachmentResponse"];
                 };
             };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
         };
     };
     list_1: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path?: never;
             cookie?: never;
         };
@@ -3511,12 +5134,24 @@ export interface operations {
                     "application/json": components["schemas"]["AddressResponse"][];
                 };
             };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
         };
     };
     create_2: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path?: never;
             cookie?: never;
         };
@@ -3535,12 +5170,24 @@ export interface operations {
                     "application/json": components["schemas"]["AddressResponse"];
                 };
             };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
         };
     };
     makeDefault: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path: {
                 id: string;
             };
@@ -3557,6 +5204,15 @@ export interface operations {
                     "application/json": components["schemas"]["AddressResponse"];
                 };
             };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
         };
     };
     mine: {
@@ -3569,7 +5225,10 @@ export interface operations {
                 /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
                 sort?: string[];
             };
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path?: never;
             cookie?: never;
         };
@@ -3584,12 +5243,24 @@ export interface operations {
                     "application/json": components["schemas"]["PageResponseComplaintResponse"];
                 };
             };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
         };
     };
     file: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path?: never;
             cookie?: never;
         };
@@ -3608,12 +5279,24 @@ export interface operations {
                     "application/json": components["schemas"]["ComplaintResponse"];
                 };
             };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
         };
     };
     refresh: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path?: never;
             cookie?: never;
         };
@@ -3632,12 +5315,24 @@ export interface operations {
                     "application/json": components["schemas"]["TokenResponse"];
                 };
             };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
         };
     };
     verifyOtp: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path?: never;
             cookie?: never;
         };
@@ -3656,12 +5351,24 @@ export interface operations {
                     "application/json": components["schemas"]["TokenResponse"];
                 };
             };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
         };
     };
     requestOtp: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path?: never;
             cookie?: never;
         };
@@ -3680,18 +5387,30 @@ export interface operations {
                     "application/json": components["schemas"]["OtpChallengeResponse"];
                 };
             };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
         };
     };
     logout: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path?: never;
             cookie?: never;
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["RefreshRequest"];
+                "application/json": components["schemas"]["LogoutRequest"];
             };
         };
         responses: {
@@ -3702,12 +5421,24 @@ export interface operations {
                 };
                 content?: never;
             };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
         };
     };
     unblock: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path: {
                 id: string;
             };
@@ -3724,12 +5455,24 @@ export interface operations {
                     "application/json": components["schemas"]["AdminUserResponse"];
                 };
             };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
         };
     };
     block: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path: {
                 id: string;
             };
@@ -3750,12 +5493,24 @@ export interface operations {
                     "application/json": components["schemas"]["AdminUserResponse"];
                 };
             };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
         };
     };
     reindex: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path?: never;
             cookie?: never;
         };
@@ -3772,12 +5527,58 @@ export interface operations {
                     };
                 };
             };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    retry: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: number;
+                    };
+                };
+            };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
         };
     };
     resolve: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path: {
                 id: string;
             };
@@ -3798,12 +5599,24 @@ export interface operations {
                     "application/json": components["schemas"]["AdminOrderResponse"];
                 };
             };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
         };
     };
     reject_1: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path: {
                 id: string;
             };
@@ -3824,12 +5637,24 @@ export interface operations {
                     "application/json": components["schemas"]["MasterProfileResponse"];
                 };
             };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
         };
     };
     approve: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path: {
                 id: string;
             };
@@ -3846,12 +5671,24 @@ export interface operations {
                     "application/json": components["schemas"]["MasterProfileResponse"];
                 };
             };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
         };
     };
     settle: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path?: never;
             cookie?: never;
         };
@@ -3870,12 +5707,24 @@ export interface operations {
                     "application/json": components["schemas"]["SettlementResponse"];
                 };
             };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
         };
     };
     close: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path?: never;
             cookie?: never;
         };
@@ -3892,12 +5741,24 @@ export interface operations {
                     };
                 };
             };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
         };
     };
     take: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path: {
                 id: string;
             };
@@ -3914,12 +5775,24 @@ export interface operations {
                     "application/json": components["schemas"]["AdminComplaintResponse"];
                 };
             };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
         };
     };
     close_1: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path: {
                 id: string;
             };
@@ -3940,6 +5813,15 @@ export interface operations {
                     "application/json": components["schemas"]["AdminComplaintResponse"];
                 };
             };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
         };
     };
     services: {
@@ -3947,7 +5829,10 @@ export interface operations {
             query?: {
                 categoryId?: string;
             };
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path?: never;
             cookie?: never;
         };
@@ -3962,12 +5847,24 @@ export interface operations {
                     "application/json": components["schemas"]["ServiceAdminResponse"][];
                 };
             };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
         };
     };
     createService: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path?: never;
             cookie?: never;
         };
@@ -3986,12 +5883,24 @@ export interface operations {
                     "application/json": components["schemas"]["ServiceAdminResponse"];
                 };
             };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
         };
     };
     categories: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path?: never;
             cookie?: never;
         };
@@ -4006,12 +5915,24 @@ export interface operations {
                     "application/json": components["schemas"]["CategoryAdminResponse"][];
                 };
             };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
         };
     };
     createCategory: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path?: never;
             cookie?: never;
         };
@@ -4028,6 +5949,83 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["CategoryAdminResponse"];
+                };
+            };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    admins: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminResponse"][];
+                };
+            };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    appoint: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AppointAdminRequest"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminResponse"];
+                };
+            };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
                 };
             };
         };
@@ -4053,7 +6051,10 @@ export interface operations {
                 page?: number;
                 size?: number;
             };
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path?: never;
             cookie?: never;
         };
@@ -4068,12 +6069,24 @@ export interface operations {
                     "application/json": components["schemas"]["PageResponseMasterSearchItem"];
                 };
             };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
         };
     };
     meta: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path?: never;
             cookie?: never;
         };
@@ -4088,6 +6101,15 @@ export interface operations {
                     "application/json": components["schemas"]["MetaResponse"];
                 };
             };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
         };
     };
     search: {
@@ -4095,7 +6117,10 @@ export interface operations {
             query: {
                 q: string;
             };
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path?: never;
             cookie?: never;
         };
@@ -4110,12 +6135,24 @@ export interface operations {
                     "application/json": components["schemas"]["ServiceResponse"][];
                 };
             };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
         };
     };
     service: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path: {
                 id: string;
             };
@@ -4132,12 +6169,90 @@ export interface operations {
                     "application/json": components["schemas"]["ServiceResponse"];
                 };
             };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    icons: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IconResponse"][];
+                };
+            };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    icon: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
+            path: {
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "image/svg+xml": string;
+                };
+            };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
         };
     };
     categories_1: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path?: never;
             cookie?: never;
         };
@@ -4152,12 +6267,24 @@ export interface operations {
                     "application/json": components["schemas"]["CategoryTreeResponse"][];
                 };
             };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
         };
     };
     services_1: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path: {
                 id: string;
             };
@@ -4174,12 +6301,24 @@ export interface operations {
                     "application/json": components["schemas"]["ServiceResponse"][];
                 };
             };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
         };
     };
     info: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path: {
                 orderId: string;
             };
@@ -4196,6 +6335,15 @@ export interface operations {
                     "application/json": components["schemas"]["ChatInfo"];
                 };
             };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
         };
     };
     list_2: {
@@ -4205,7 +6353,10 @@ export interface operations {
                 page?: number;
                 size?: number;
             };
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path?: never;
             cookie?: never;
         };
@@ -4220,12 +6371,24 @@ export interface operations {
                     "application/json": components["schemas"]["PageResponseNotificationResponse"];
                 };
             };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
         };
     };
     unreadCount: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path?: never;
             cookie?: never;
         };
@@ -4242,12 +6405,24 @@ export interface operations {
                     };
                 };
             };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
         };
     };
     me: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path?: never;
             cookie?: never;
         };
@@ -4262,6 +6437,15 @@ export interface operations {
                     "application/json": components["schemas"]["UserResponse"];
                 };
             };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
         };
     };
     forMaster: {
@@ -4274,7 +6458,10 @@ export interface operations {
                 /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
                 sort?: string[];
             };
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path: {
                 masterId: string;
             };
@@ -4291,12 +6478,24 @@ export interface operations {
                     "application/json": components["schemas"]["PageResponsePublicReviewResponse"];
                 };
             };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
         };
     };
     get_4: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path: {
                 id: string;
             };
@@ -4313,12 +6512,24 @@ export interface operations {
                     "application/json": components["schemas"]["PublicMasterResponse"];
                 };
             };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
         };
     };
     services_2: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path: {
                 id: string;
             };
@@ -4335,12 +6546,24 @@ export interface operations {
                     "application/json": components["schemas"]["PublicMasterServiceResponse"][];
                 };
             };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
         };
     };
     portfolio_1: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path: {
                 id: string;
             };
@@ -4357,12 +6580,24 @@ export interface operations {
                     "application/json": components["schemas"]["PortfolioItemResponse"][];
                 };
             };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
         };
     };
     services_3: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path?: never;
             cookie?: never;
         };
@@ -4375,6 +6610,15 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["MasterServiceResponse"][];
+                };
+            };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
                 };
             };
         };
@@ -4390,7 +6634,10 @@ export interface operations {
                 /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
                 sort?: string[];
             };
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path?: never;
             cookie?: never;
         };
@@ -4405,12 +6652,24 @@ export interface operations {
                     "application/json": components["schemas"]["PageResponseOrderSummary"];
                 };
             };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
         };
     };
     get_5: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path: {
                 id: string;
             };
@@ -4427,12 +6686,24 @@ export interface operations {
                     "application/json": components["schemas"]["MasterOrderResponse"];
                 };
             };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
         };
     };
     offers: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path?: never;
             cookie?: never;
         };
@@ -4447,6 +6718,15 @@ export interface operations {
                     "application/json": components["schemas"]["MasterOfferResponse"][];
                 };
             };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
         };
     };
     transactions: {
@@ -4459,7 +6739,10 @@ export interface operations {
                 /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
                 sort?: string[];
             };
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path?: never;
             cookie?: never;
         };
@@ -4474,12 +6757,24 @@ export interface operations {
                     "application/json": components["schemas"]["PageResponseTransactionResponse"];
                 };
             };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
         };
     };
     summary: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path?: never;
             cookie?: never;
         };
@@ -4492,6 +6787,15 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["SummaryResponse"];
+                };
+            };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
                 };
             };
         };
@@ -4508,7 +6812,10 @@ export interface operations {
                 /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
                 sort?: string[];
             };
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path?: never;
             cookie?: never;
         };
@@ -4523,12 +6830,24 @@ export interface operations {
                     "application/json": components["schemas"]["PageResponseCommissionResponse"];
                 };
             };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
         };
     };
     get_6: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path: {
                 id: string;
             };
@@ -4545,12 +6864,24 @@ export interface operations {
                     "application/json": components["schemas"]["OrderResponse"];
                 };
             };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
         };
     };
     get_7: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path: {
                 id: string;
             };
@@ -4567,14 +6898,23 @@ export interface operations {
                     "application/json": components["schemas"]["ComplaintResponse"];
                 };
             };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
         };
     };
     list_3: {
         parameters: {
             query?: {
                 phone?: string;
-                role?: "CUSTOMER" | "MASTER" | "ADMIN";
-                status?: "ACTIVE" | "BLOCKED";
+                role?: "CUSTOMER" | "MASTER" | "ADMIN" | "SUPER_ADMIN";
+                status?: "ACTIVE" | "BLOCKED" | "DELETED";
                 /** @description Zero-based page index (0..N) */
                 page?: number;
                 /** @description The size of the page to be returned */
@@ -4582,7 +6922,10 @@ export interface operations {
                 /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
                 sort?: string[];
             };
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path?: never;
             cookie?: never;
         };
@@ -4595,6 +6938,49 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["PageResponseAdminUserResponse"];
+                };
+            };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    dead: {
+        parameters: {
+            query?: {
+                limit?: number;
+            };
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeadEvent"][];
+                };
+            };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
                 };
             };
         };
@@ -4613,7 +6999,10 @@ export interface operations {
                 /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
                 sort?: string[];
             };
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path?: never;
             cookie?: never;
         };
@@ -4628,6 +7017,15 @@ export interface operations {
                     "application/json": components["schemas"]["PageResponseOrderSummary"];
                 };
             };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
         };
     };
     adminMessages: {
@@ -4636,7 +7034,10 @@ export interface operations {
                 before?: string;
                 limit?: number;
             };
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path: {
                 orderId: string;
             };
@@ -4653,12 +7054,24 @@ export interface operations {
                     "application/json": components["schemas"]["MessageView"][];
                 };
             };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
         };
     };
     get_8: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path: {
                 id: string;
             };
@@ -4675,6 +7088,15 @@ export interface operations {
                     "application/json": components["schemas"]["AdminOrderResponse"];
                 };
             };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
         };
     };
     list_5: {
@@ -4688,7 +7110,10 @@ export interface operations {
                 /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
                 sort?: string[];
             };
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path?: never;
             cookie?: never;
         };
@@ -4703,12 +7128,24 @@ export interface operations {
                     "application/json": components["schemas"]["PageResponseAdminMasterResponse"];
                 };
             };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
         };
     };
     get_9: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path: {
                 id: string;
             };
@@ -4725,6 +7162,15 @@ export interface operations {
                     "application/json": components["schemas"]["AdminMasterDetailResponse"];
                 };
             };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
         };
     };
     transactions_1: {
@@ -4738,7 +7184,10 @@ export interface operations {
                 /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
                 sort?: string[];
             };
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path?: never;
             cookie?: never;
         };
@@ -4753,6 +7202,15 @@ export interface operations {
                     "application/json": components["schemas"]["PageResponseTransactionResponse"];
                 };
             };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
         };
     };
     reconcile: {
@@ -4761,7 +7219,10 @@ export interface operations {
                 from?: string;
                 to?: string;
             };
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path?: never;
             cookie?: never;
         };
@@ -4776,6 +7237,15 @@ export interface operations {
                     "application/json": components["schemas"]["Report"];
                 };
             };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
         };
     };
     invoices: {
@@ -4784,7 +7254,10 @@ export interface operations {
                 period?: string;
                 masterId?: string;
             };
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path?: never;
             cookie?: never;
         };
@@ -4797,6 +7270,15 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Invoice"][];
+                };
+            };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
                 };
             };
         };
@@ -4814,7 +7296,10 @@ export interface operations {
                 /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
                 sort?: string[];
             };
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path?: never;
             cookie?: never;
         };
@@ -4827,6 +7312,15 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["PageResponseCommissionResponse"];
+                };
+            };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
                 };
             };
         };
@@ -4845,7 +7339,10 @@ export interface operations {
                 /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
                 sort?: string[];
             };
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path?: never;
             cookie?: never;
         };
@@ -4860,12 +7357,24 @@ export interface operations {
                     "application/json": components["schemas"]["PageResponseComplaintResponse"];
                 };
             };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
         };
     };
     adminGet: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path: {
                 id: string;
             };
@@ -4882,12 +7391,56 @@ export interface operations {
                     "application/json": components["schemas"]["AdminComplaintResponse"];
                 };
             };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    permissions: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PermissionResponse"][];
+                };
+            };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
         };
     };
     deleteDocument: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path: {
                 id: string;
             };
@@ -4902,12 +7455,24 @@ export interface operations {
                 };
                 content?: never;
             };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
         };
     };
     offline: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path?: never;
             cookie?: never;
         };
@@ -4920,12 +7485,24 @@ export interface operations {
                 };
                 content?: never;
             };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
         };
     };
     removePortfolio: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path: {
                 id: string;
             };
@@ -4940,12 +7517,24 @@ export interface operations {
                 };
                 content?: never;
             };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
         };
     };
     detach: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
             path: {
                 id: string;
                 attachmentId: string;
@@ -4960,6 +7549,47 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    delete_1: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Javob matnlari tili */
+                "Accept-Language"?: "uz" | "uz-Cyrl" | "ru" | "en";
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Xato (RFC 9457). Kodlar ro'yxati — sahifa boshida */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
             };
         };
     };

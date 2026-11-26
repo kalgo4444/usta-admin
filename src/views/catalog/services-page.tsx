@@ -5,6 +5,8 @@ import { PencilIcon, PlusIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useCategories, useServices } from '@/entities/catalog/api';
 import { buildCategoryTree, flattenTree, localized } from '@/entities/catalog/model';
+import { CatalogIcon } from '@/entities/catalog/ui';
+import { DeleteCatalogItemButton } from '@/features/delete-catalog-item/delete-catalog-item';
 import { ServiceFormDialog } from '@/features/service-form/service-form-dialog';
 import type { CatalogService } from '@/shared/api/types';
 import { useLocale } from '@/shared/i18n/locale';
@@ -43,6 +45,19 @@ export function ServicesPage() {
 	);
 
 	const columns = [
+		col.display({
+			id: 'media',
+			header: '',
+			cell: ({ row }) => (
+				<span className='flex items-center gap-2'>
+					<CatalogIcon url={row.original.iconUrl} className='size-5' />
+					{row.original.imageUrl && (
+						// eslint-disable-next-line @next/next/no-img-element -- presigned URL
+						<img src={row.original.imageUrl} alt='' className='size-8 rounded-sm object-cover' />
+					)}
+				</span>
+			),
+		}),
 		col.accessor(r => localized(r.name, locale), {
 			id: 'name',
 			header: t('name'),
@@ -77,14 +92,21 @@ export function ServicesPage() {
 			header: '',
 			meta: { className: 'text-right' },
 			cell: ({ row }) => (
-				<Button
-					variant='ghost'
-					size='icon-sm'
-					aria-label={tc('edit')}
-					onClick={() => setDialog({ service: row.original })}
-				>
-					<PencilIcon />
-				</Button>
+				<span className='inline-flex gap-1'>
+					<Button
+						variant='ghost'
+						size='icon-sm'
+						aria-label={tc('edit')}
+						onClick={() => setDialog({ service: row.original })}
+					>
+						<PencilIcon />
+					</Button>
+					<DeleteCatalogItemButton
+						kind='service'
+						id={row.original.id!}
+						name={localized(row.original.name, locale)}
+					/>
+				</span>
 			),
 		}),
 	];

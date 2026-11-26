@@ -62,7 +62,7 @@ export function ComplaintActions({
 			orderResolution: z.enum(['COMPLETED', 'CANCELLED', NONE]),
 			price: z
 				.number({ error: te('invalidNumber') })
-				.min(0)
+				.min(1, te('minValue', { min: 1 }))
 				.optional(),
 		})
 		.refine(v => v.orderResolution !== 'COMPLETED' || orderHasPrice || v.price !== undefined, {
@@ -197,7 +197,7 @@ export function ComplaintActions({
 									<Input
 										id='c-price'
 										type='number'
-										min={0}
+										min={1}
 										step='any'
 										className='num'
 										{...form.register('price', { setValueAs: toOptionalNumber })}

@@ -3,6 +3,7 @@
 import { useTranslations } from 'next-intl';
 import { useServerMeta } from '@/entities/system/api';
 import { ReindexCard } from '@/features/reindex/reindex-card';
+import { DeadEventsCard } from '@/features/retry-outbox/dead-events-card';
 import { formatDate } from '@/shared/lib/format';
 import { Button } from '@/shared/ui/kit/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/kit/card';
@@ -55,6 +56,7 @@ export function SystemPage() {
 					</CardContent>
 				</Card>
 				<ReindexCard />
+				<DeadEventsCard />
 			</div>
 		</div>
 	);

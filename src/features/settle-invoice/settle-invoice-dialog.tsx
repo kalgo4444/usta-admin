@@ -26,8 +26,8 @@ import {
 import { Field } from '@/shared/ui/field';
 
 /**
- * POST /admin/finance/settlements. The backend only accepts the full unpaid remainder,
- * so the amount is prefilled and locked to it.
+ * POST /admin/finance/settlements. The backend only accepts the invoice's `due`
+ * (overpayment already deducted), so the amount is prefilled and locked to it.
  */
 export function SettleInvoiceDialog({
 	invoice,

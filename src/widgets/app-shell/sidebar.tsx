@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useCount } from '@/entities/system/api';
+import { useAccess } from '@/entities/user/api';
 import { cn } from '@/shared/lib/utils';
 import { isActive, NAV, type NavItem } from './nav';
 
@@ -27,10 +28,15 @@ function NavBadge({ kind }: { kind: NonNullable<NavItem['badge']> }) {
 export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
 	const t = useTranslations('nav');
 	const pathname = usePathname();
+	const { can } = useAccess();
+	const groups = NAV.map(g => ({
+		...g,
+		items: g.items.filter(i => !i.access || can(i.access)),
+	})).filter(g => g.items.length > 0);
 
 	return (
 		<nav className='flex flex-col gap-6 px-3 py-4'>
-			{NAV.map((group, gi) => (
+			{groups.map((group, gi) => (
 				<div key={gi} className='space-y-1'>
 					{group.key && (
 						<p className='px-3 pb-1 text-[11px] font-semibold tracking-wide text-subtle-foreground uppercase'>

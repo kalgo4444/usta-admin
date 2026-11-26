@@ -14,8 +14,9 @@ import {
 	toSessionPayload,
 	writeRefreshCookie,
 } from '@/shared/api/backend.server';
+import { isAdmin } from '@/shared/lib/access';
 
-/** Login: verify OTP, require ADMIN role, store refresh token in an httpOnly cookie. */
+/** Login: verify OTP, require ADMIN/SUPER_ADMIN, store refresh token in an httpOnly cookie. */
 export async function POST(req: NextRequest) {
 	const lang = req.headers.get('accept-language');
 	// Login body is just { phone, code }.
@@ -39,7 +40,7 @@ export async function POST(req: NextRequest) {
 	const user = tokens.user;
 	if (!isActiveAdmin(user)) {
 		if (tokens.refreshToken) await revokeRefreshToken(tokens.refreshToken, lang);
-		return problem(403, user?.roles?.includes('ADMIN') ? 'USER_BLOCKED' : 'NOT_ADMIN');
+		return problem(403, isAdmin(user) ? 'USER_BLOCKED' : 'NOT_ADMIN');
 	}
 
 	await writeRefreshCookie(tokens);

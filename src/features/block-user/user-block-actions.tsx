@@ -5,7 +5,8 @@ import { useQueryClient } from '@tanstack/react-query';
 import { BanIcon, ShieldCheckIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
-import { userApi } from '@/entities/user/api';
+import { useAccess, userApi } from '@/entities/user/api';
+import { canManageUser } from '@/entities/user/model';
 import { invalidate } from '@/shared/api/invalidate';
 import type { AdminUser } from '@/shared/api/types';
 import { useMutationErrorHandler } from '@/shared/api/use-mutation-error';
@@ -14,7 +15,10 @@ import { Button } from '@/shared/ui/kit/button';
 import { ConfirmDialog } from '@/shared/ui/confirm-dialog';
 import { ReasonDialog } from '@/shared/ui/reason-dialog';
 
-/** Block (reason ≤500) / unblock. Hidden for ADMIN accounts — the backend forbids it. */
+/**
+ * Block (reason ≤500) / unblock. Needs USERS; an ADMIN target only for a super admin, a
+ * SUPER_ADMIN target never (the backend forbids both). Deleted accounts have no actions.
+ */
 export function UserBlockActions({
 	user,
 	size = 'xs',
@@ -25,9 +29,10 @@ export function UserBlockActions({
 	const t = useTranslations('users');
 	const qc = useQueryClient();
 	const onError = useMutationErrorHandler();
+	const { can, superAdmin } = useAccess();
 	const [open, setOpen] = useState<'block' | 'unblock' | null>(null);
 
-	if (!user.id || user.roles?.includes('ADMIN')) return null;
+	if (!user.id || !canManageUser(user, { can: can('USERS'), superAdmin })) return null;
 	const id = user.id;
 	const done = () => invalidate(qc, ['admin', 'users'], ['admin', 'complaint']);
 

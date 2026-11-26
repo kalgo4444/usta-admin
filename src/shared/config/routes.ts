@@ -15,6 +15,7 @@ export const routes = {
 	ledger: '/finance/ledger',
 	reconciliation: '/finance/reconciliation',
 	system: '/system',
+	admins: '/admins',
 } as const;
 
 export function withQuery(path: string, query: Record<string, string | number | undefined | null>) {

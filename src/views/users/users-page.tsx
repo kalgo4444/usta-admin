@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import { useAdminUsers } from '@/entities/user/api';
 import { UserBlockActions } from '@/features/block-user/user-block-actions';
+import { DeleteUserButton } from '@/features/delete-user/delete-user-button';
 import { ENUMS, type AdminUser, type UserRole, type UserStatus } from '@/shared/api/types';
 import { routes, withQuery } from '@/shared/config/routes';
 import { useEnumLabel } from '@/shared/i18n/use-enum';
@@ -78,7 +79,7 @@ export function UsersPage() {
 				const u = row.original;
 				return (
 					<div className='flex items-center justify-end gap-3'>
-						{u.roles?.includes('MASTER') && (
+						{u.status !== 'DELETED' && u.roles?.includes('MASTER') && (
 							<Link
 								href={routes.master(u.id!)}
 								className='text-xs font-semibold whitespace-nowrap text-primary'
@@ -95,6 +96,7 @@ export function UsersPage() {
 							</Link>
 						)}
 						<UserBlockActions user={u} />
+						<DeleteUserButton user={u} />
 					</div>
 				);
 			},

@@ -6,6 +6,7 @@ import { useParams } from 'next/navigation';
 import { StarIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useAdminComplaints } from '@/entities/complaint/api';
+import { useAccess } from '@/entities/user/api';
 import { useAdminOrder } from '@/entities/order/api';
 import { ResolveDisputeDialog } from '@/features/resolve-dispute/resolve-dispute-dialog';
 import { routes, withQuery } from '@/shared/config/routes';
@@ -33,12 +34,16 @@ export function OrderDetailPage() {
 	const tu = useTranslations('users');
 	const q = useAdminOrder(id);
 	const [cPage, setCPage] = useState(0);
-	const complaints = useAdminComplaints({
-		orderId: id,
-		page: cPage,
-		size: 5,
-		sort: 'createdAt,DESC',
-	});
+	const { can } = useAccess();
+	const complaints = useAdminComplaints(
+		{
+			orderId: id,
+			page: cPage,
+			size: 5,
+			sort: 'createdAt,DESC',
+		},
+		can('COMPLAINTS'),
+	);
 
 	if (q.error) {
 		return (
@@ -231,16 +236,18 @@ export function OrderDetailPage() {
 				<OffersTable offers={offers} />
 			</section>
 
-			<section className='space-y-3'>
-				<h2 className='text-lg font-semibold'>{t('complaints')}</h2>
-				<ComplaintsTable
-					query={complaints}
-					page={cPage}
-					size={5}
-					onPageChange={setCPage}
-					hideOrder
-				/>
-			</section>
+			{can('COMPLAINTS') && (
+				<section className='space-y-3'>
+					<h2 className='text-lg font-semibold'>{t('complaints')}</h2>
+					<ComplaintsTable
+						query={complaints}
+						page={cPage}
+						size={5}
+						onPageChange={setCPage}
+						hideOrder
+					/>
+				</section>
+			)}
 		</div>
 	);
 }

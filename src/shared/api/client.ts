@@ -4,9 +4,10 @@ import axios, { type AxiosRequestConfig, type InternalAxiosRequestConfig } from 
 import { API_BASE } from '@/shared/config/env';
 import { routes } from '@/shared/config/routes';
 import { localeStore } from '@/shared/i18n/locale';
+import { sanitizeDeep } from '@/shared/lib/text';
 import { toApiError } from './errors';
 import { trackRequest } from './server-status';
-import { ensureAccessToken, refreshSession, SessionExpiredError } from './session';
+import { ensureAccessToken, logout, refreshSession, SessionExpiredError } from './session';
 
 declare module 'axios' {
 	interface AxiosRequestConfig {
@@ -33,6 +34,8 @@ function redirectToLogin() {
 api.interceptors.request.use(async (cfg: InternalAxiosRequestConfig) => {
 	cfg._done = trackRequest();
 	cfg.headers.set('Accept-Language', localeStore.get());
+	// The backend rejects invisible/control characters (400); FormData uploads pass as-is.
+	if (cfg.data && !(cfg.data instanceof FormData)) cfg.data = sanitizeDeep(cfg.data);
 	if (!cfg.skipAuth) {
 		try {
 			cfg.headers.set('Authorization', `Bearer ${await ensureAccessToken()}`);
@@ -53,6 +56,8 @@ api.interceptors.response.use(
 	async err => {
 		const original = err.config as AxiosRequestConfig | undefined;
 		original?._done?.();
+		// 401 covers both an expired token and TOKEN_OUTDATED (permissions changed):
+		// a refresh returns a token with the new permissions.
 		if (err.response?.status === 401 && original && !original.skipAuth && !original._retry) {
 			original._retry = true;
 			try {
@@ -64,7 +69,12 @@ api.interceptors.response.use(
 				throw toApiError(e);
 			}
 		}
-		throw toApiError(err);
+		const apiErr = toApiError(err);
+		// Blocked or deleted account: may arrive on any request.
+		if (apiErr.status === 403 && apiErr.code === 'USER_BLOCKED' && !original?.skipAuth) {
+			void logout().finally(redirectToLogin);
+		}
+		throw apiErr;
 	},
 );
 
@@ -76,6 +86,8 @@ export const http = {
 		api.post<T>(url, body, cfg).then(r => r.data),
 	put: <T>(url: string, body?: unknown, cfg?: AxiosRequestConfig) =>
 		api.put<T>(url, body, cfg).then(r => r.data),
+	delete: <T = void>(url: string, params?: object, cfg?: AxiosRequestConfig) =>
+		api.delete<T>(url, { ...cfg, params }).then(r => r.data),
 };
 
 /** Drop empty filter values so they don't reach the backend as `?status=`. */

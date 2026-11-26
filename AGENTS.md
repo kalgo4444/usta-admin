@@ -5,7 +5,7 @@ Admin dashboard for the Usta platform (Next.js 16 App Router, React 19, TypeScri
 ## Commands
 
 ```bash
-npm run dev          # next dev (needs .env: API_URL=<backend origin>, see .env.example)
+npm run dev          # next dev on PORT (default 4010) via scripts/next.mjs; needs .env: API_URL=<backend origin>, see .env.example
 npm run build        # production build — the real check for cacheComponents/Suspense errors
 npm run lint         # eslint (react-hooks/refs and react-compiler rules are errors)
 npm run typecheck    # tsc --noEmit
@@ -29,6 +29,7 @@ If `tsc`/`build` fails on `.next/dev/types/validator.ts` referencing deleted rou
 - `src/app/api/session/` (login/logout) and `session/refresh/` handle tokens. The backend **rotates the refresh token on every refresh**, so the refresh token lives only in an httpOnly cookie (`usta_rt`) and the access token only in memory (`src/shared/api/session.ts`).
 - `session.ts` makes refresh single-flight (shared promise + Web Locks across tabs) and refreshes proactively 30 s before expiry. `client.ts` (axios) attaches the token, retries once after a 401 refresh, and normalises RFC 9457 `problem+json` errors into `ApiError` (`errors.ts`).
 - `src/proxy.ts` (Next 16's renamed middleware) only checks for the cookie and redirects to `/login?next=…`; real ADMIN authorization is `AdminShell` (`GET /me` must return an ACTIVE user with role ADMIN) plus the backend.
+- Permissions (`user.permissions`: USERS, MASTERS, CATALOG, ORDERS, FINANCE, COMPLAINTS, SYSTEM, DELETE; SUPER_ADMIN has all) gate the menu and routes via `access` in `widgets/app-shell/nav.ts` (checked in `AdminShell`) and actions via `useAccess()` (`entities/user/api.ts`). `401 TOKEN_OUTDATED` (permissions changed) is just a refresh; `403 USER_BLOCKED` logs out (`client.ts`). Request bodies are stripped of invisible/control chars before sending (`shared/lib/text.ts`).
 - Requests pending > 4 s drive the "server waking up" banner (`server-status.ts`); only network/502-504 errors are retried (2×, see `app/providers.tsx`).
 
 **Layering (FSD-style).** `shared` → `entities` → `features` → `widgets` → `views` → `app`; import only downward.
@@ -48,7 +49,7 @@ If `tsc`/`build` fails on `.next/dev/types/validator.ts` referencing deleted rou
 
 - Master document, portfolio and order attachment URLs are presigned and expire: those queries use `staleTime: 0` / `gcTime: 0` — don't add caching.
 - `/admin/masters` has no name filter; the master picker and finance name lookups search client-side over the paged directory (`useMasterDirectory`).
-- Catalog items are never deleted, only set `INACTIVE`. ADMIN users can't be blocked (the Block button is hidden).
+- Catalog delete is an archive (`CATALOG`+`DELETE`); a non-empty category answers `409 CATEGORY_NOT_EMPTY` and is retried with `?cascade=true`. Saving a category/service with an `icon` key removes an uploaded icon, so the forms omit an unchanged key when `customIcon` is set. Only a SUPER_ADMIN may block/delete an ADMIN; nobody may touch a SUPER_ADMIN (`entities/user/model.ts`).
 - `react-hook-form`'s `watch()` breaks the React Compiler lint rule — use `useWatch`. Form dialogs are split so the form component mounts per open (fresh defaults instead of reset effects); avoid reading refs during render.
 - `DataTable` uses `"use no memo"` because the TanStack table instance is mutable.
 - CSP is a static header in `next.config.ts`, deliberately without nonces (nonces force dynamic rendering and break PPR). A new external origin (iframe, fetch, font) must be added there; `connect-src` is `'self'` because all API traffic goes through the proxy.

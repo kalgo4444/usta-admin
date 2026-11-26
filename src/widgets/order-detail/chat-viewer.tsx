@@ -82,7 +82,19 @@ export function ChatViewer({
 											: 'border border-border bg-card',
 									)}
 								>
-									{m.content}
+									{m.imageUrl && (
+										<a href={m.imageUrl} target='_blank' rel='noreferrer' className='block'>
+											{/* eslint-disable-next-line @next/next/no-img-element -- presigned URL */}
+											<img
+												src={m.imageUrl}
+												alt={t('chatImage')}
+												className='max-h-64 rounded-md object-contain'
+											/>
+										</a>
+									)}
+									{m.content && (
+										<span className={cn(m.imageUrl && 'mt-1.5 block')}>{m.content}</span>
+									)}
 								</div>
 								<span className='mt-0.5 px-1 num text-[11px] text-subtle-foreground'>
 									{formatDate(m.createdAt)}

@@ -2,7 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { http } from '@/shared/api/client';
-import type { MetaResponse, Page } from '@/shared/api/types';
+import type { DeadEvent, MetaResponse, Page } from '@/shared/api/types';
 
 export function useServerMeta() {
 	return useQuery({
@@ -20,6 +20,19 @@ export function useCount(path: string, params: Record<string, string | undefined
 	});
 }
 
+export const DEAD_EVENTS_LIMIT = 100;
+
+/** Outbox events whose delivery attempts ran out (oldest first). SYSTEM permission. */
+export function useDeadEvents(enabled = true) {
+	return useQuery({
+		queryKey: ['admin', 'outbox', 'dead', { limit: DEAD_EVENTS_LIMIT }],
+		queryFn: () => http.get<DeadEvent[]>('/admin/outbox/dead', { limit: DEAD_EVENTS_LIMIT }),
+		enabled,
+	});
+}
+
 export const systemApi = {
 	reindex: () => http.post<Record<string, number>>('/admin/search/reindex'),
+	/** Re-queue every dead event; call after the cause is fixed. */
+	retryDead: () => http.post<Record<string, number>>('/admin/outbox/dead/retry'),
 };

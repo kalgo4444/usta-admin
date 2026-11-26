@@ -1,69 +1,71 @@
 # Usta Admin
 
-Admin dashboard for the Usta platform — implementation of [`docs/index.md`](docs/index.md).
+Usta chaqirish platformasining administrator paneli.
 
-## Run
+## Imkoniyatlar
+
+- Ustalarni tekshirish: hujjatlarni ko'rish, tasdiqlash yoki rad etish
+- Foydalanuvchilarni bloklash va o'chirish
+- Buyurtmalarni kuzatish, chatni o'qish, nizolarni hal qilish
+- Shikoyatlarni ko'rib chiqish
+- Katalog: kategoriyalar, xizmatlar, rasm va ikonkalar
+- Moliya: invoice'lar, komissiyalar, ledger, solishtirish
+- Adminlar va ularning huquqlari (faqat super admin)
+- Tizim: qidiruv indeksi, yetkazilmagan eventlar
+
+Interfeys o'zbek va rus tillarida.
+
+## Texnologiyalar
+
+Next.js 16, React 19, TypeScript, Tailwind CSS 4, TanStack Query va Table, React Hook Form + Zod, next-intl.
+
+## Ishga tushirish
 
 ```bash
-cp .env.example .env      # API_URL = backend origin (server-only)
+cp .env.example .env   # API_URL = backend manzili
 npm install
-npm run dev               # http://localhost:4010
+npm run dev            # http://localhost:4010 (port: .env dagi PORT)
 ```
 
-| Script                                  |                                                             |
-| --------------------------------------- | ----------------------------------------------------------- |
-| `npm run dev` / `build` / `start`       | Next.js                                                     |
-| `npm run lint` · `typecheck` · `format` | ESLint · tsc · Prettier                                     |
-| `npm test`                              | Unit tests (Vitest)                                         |
-| `npm run build && npm run test:e2e`     | E2E (Playwright, backend mocked in the browser)             |
-| `API_URL=… npm run gen:api`             | Regenerate `src/shared/api/schema.d.ts` from `/v3/api-docs` |
+Kirish SMS kod orqali. Faqat `ADMIN` yoki `SUPER_ADMIN` roli bor foydalanuvchi kira oladi.
 
-Login is SMS OTP; only users with the `ADMIN` role (backend `ADMIN_PHONES`) get in.
+## Buyruqlar
 
-## Deploy
+| Buyruq                              | Vazifasi                                     |
+| ----------------------------------- | -------------------------------------------- |
+| `npm run build`                     | Production build                             |
+| `npm run lint`                      | ESLint                                       |
+| `npm run typecheck`                 | TypeScript tekshiruvi                        |
+| `npm run format`                    | Prettier                                     |
+| `npm test`                          | Unit testlar (Vitest)                        |
+| `npm run build && npm run test:e2e` | E2E testlar (Playwright, backend shart emas) |
+| `API_URL=… npm run gen:api`         | API tiplarini qayta generatsiya qilish       |
+
+## Docker
 
 ```bash
-API_URL=https://<backend-origin> docker compose up --build -d   # port ${PORT:-4010}
+API_URL=https://<backend-manzili> docker compose up --build -d   # port: PORT, standart 4010
 ```
 
-- `API_URL` is required at runtime (server-only); the server refuses to start without it.
-  The build doesn't need it.
-- Liveness probe: `GET /api/health` → `{"status":"ok"}`.
-- Server errors are logged as one JSON line each (`src/instrumentation.ts`).
-- Security headers (CSP without nonces, HSTS, Permissions-Policy) are set in `next.config.ts`.
+`API_URL` majburiy: usiz server ishga tushmaydi. Holatni tekshirish: `GET /api/health`.
 
-## How it talks to the backend
+## Tuzilma
 
-The backend rejects browser CORS preflights, so the browser never calls it directly:
-
-- `src/app/api/v1/[...path]` — same-origin proxy for every `/api/v1/*` call.
-- `src/app/api/session` — OTP verify (login), `refresh`, logout. The rotating **refresh
-  token lives only in an httpOnly cookie** (`usta_rt`); the access token stays in memory
-  (plan §5, variant A). Token endpoints are not reachable through the generic proxy.
-- `src/shared/api/session.ts` — single-flight refresh (+ Web Locks across tabs), proactive
-  refresh 30 s before expiry, 401 → refresh once → retry.
-- `src/proxy.ts` — redirects to `/login` when there is no refresh cookie.
-- Requests pending > 4 s show the "server is waking up" banner (Render cold start);
-  network/5xx-edge errors are retried twice.
-
-## Structure (FSD)
+Feature-Sliced Design, importlar faqat yuqoridan pastga:
 
 ```
-src/app        routes (thin server components → <Suspense><View/></Suspense>), route handlers
-src/views      page compositions (FSD "pages" layer; named views to avoid Next's pages/ dir)
-src/widgets    app shell, overview widgets, order/master detail blocks, shared tables
-src/features   auth-otp, block-user, verify-master, resolve-dispute, complaint-actions,
-               category-form, service-form, settle-invoice, close-weeks, reindex, select-master, preferences
-src/entities   query hooks + API calls per domain (query keys per plan §8)
-src/shared     api client, i18n (uz/ru), ui kit (shadcn-style on radix-ui), DataTable, helpers
+src/app        route'lar va API proxy
+src/views      sahifalar
+src/widgets    yirik UI bloklar
+src/features   foydalanuvchi amallari
+src/entities   domen bo'yicha so'rovlar
+src/shared     API client, UI kit, i18n, yordamchi funksiyalar
 ```
 
-UI follows `DESIGN.md` (single blue accent, pill controls, 24 px cards, mono numerals).
+Brauzer backend'ga to'g'ridan-to'g'ri murojaat qilmaydi: so'rovlar Next.js proxy orqali o'tadi, refresh token faqat httpOnly cookie'da saqlanadi.
 
-## Deviations from the plan
+## Hujjatlar
 
-- **Charts (Recharts)** not added — there is no time-series endpoint yet (plan §12 #6).
-- **Map** uses an OpenStreetMap embed instead of Leaflet (one read-only marker).
-- **Master search** (pickers, finance) is client-side over `/admin/masters` pages of 100 —
-  the endpoint has no name filter.
-- `components.json`/shadcn CLI not used; equivalent components live in `src/shared/ui/kit`.
+- [docs/index.md](docs/index.md) — mahsulot rejasi va API
+- [DESIGN.md](DESIGN.md) — UI qoidalari
+- [AGENTS.md](AGENTS.md) — arxitektura va dasturlash qoidalari

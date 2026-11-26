@@ -7,6 +7,7 @@ import { CircleAlertIcon, StarIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { masterName, useAdminMaster } from '@/entities/master/api';
 import { useAdminOrders } from '@/entities/order/api';
+import { useAccess } from '@/entities/user/api';
 import { MasterVerificationActions } from '@/features/verify-master/master-verification-actions';
 import { routes, withQuery } from '@/shared/config/routes';
 import { formatDate } from '@/shared/lib/format';
@@ -33,13 +34,17 @@ export function MasterDetailPage() {
 	const tc = useTranslations('common');
 	const tn = useTranslations('nav');
 	const q = useAdminMaster(id);
+	const { can } = useAccess();
 	const [ordersPage, setOrdersPage] = useState(0);
-	const orders = useAdminOrders({
-		masterId: id,
-		page: ordersPage,
-		size: 10,
-		sort: 'createdAt,DESC',
-	});
+	const orders = useAdminOrders(
+		{
+			masterId: id,
+			page: ordersPage,
+			size: 10,
+			sort: 'createdAt,DESC',
+		},
+		can('ORDERS'),
+	);
 
 	if (q.error) {
 		return (
@@ -137,17 +142,22 @@ export function MasterDetailPage() {
 								<p className='text-sm whitespace-pre-line'>{profile.bio}</p>
 							</div>
 						)}
-						<div className='mt-5 flex flex-wrap gap-x-4 gap-y-2 text-sm font-semibold'>
-							<Link href={withQuery(routes.ledger, { masterId: id })} className='text-primary'>
-								{t('ledger')}
-							</Link>
-							<Link href={withQuery(routes.commissions, { masterId: id })} className='text-primary'>
-								{t('commissions')}
-							</Link>
-							<Link href={withQuery(routes.invoices, { masterId: id })} className='text-primary'>
-								{tn('invoices')}
-							</Link>
-						</div>
+						{can('FINANCE') && (
+							<div className='mt-5 flex flex-wrap gap-x-4 gap-y-2 text-sm font-semibold'>
+								<Link href={withQuery(routes.ledger, { masterId: id })} className='text-primary'>
+									{t('ledger')}
+								</Link>
+								<Link
+									href={withQuery(routes.commissions, { masterId: id })}
+									className='text-primary'
+								>
+									{t('commissions')}
+								</Link>
+								<Link href={withQuery(routes.invoices, { masterId: id })} className='text-primary'>
+									{tn('invoices')}
+								</Link>
+							</div>
+						)}
 					</CardContent>
 				</Card>
 			</div>
@@ -166,24 +176,26 @@ export function MasterDetailPage() {
 			</div>
 
 			<div className='grid gap-4 lg:grid-cols-3'>
-				<div className='space-y-3 lg:col-span-2'>
-					<div className='flex items-center justify-between'>
-						<h2 className='text-lg font-semibold'>{t('relatedOrders')}</h2>
-						<Link
-							href={withQuery(routes.orders, { masterId: id })}
-							className='text-sm font-semibold text-primary'
-						>
-							{tn('orders')}
-						</Link>
+				{can('ORDERS') && (
+					<div className='space-y-3 lg:col-span-2'>
+						<div className='flex items-center justify-between'>
+							<h2 className='text-lg font-semibold'>{t('relatedOrders')}</h2>
+							<Link
+								href={withQuery(routes.orders, { masterId: id })}
+								className='text-sm font-semibold text-primary'
+							>
+								{tn('orders')}
+							</Link>
+						</div>
+						<OrdersTable
+							query={orders}
+							page={ordersPage}
+							size={10}
+							onPageChange={setOrdersPage}
+							hideMaster
+						/>
 					</div>
-					<OrdersTable
-						query={orders}
-						page={ordersPage}
-						size={10}
-						onPageChange={setOrdersPage}
-						hideMaster
-					/>
-				</div>
+				)}
 				<MasterReviews id={id} />
 			</div>
 		</div>

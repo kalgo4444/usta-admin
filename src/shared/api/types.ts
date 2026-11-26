@@ -40,11 +40,19 @@ export type Mismatch = S['Mismatch'];
 export type SettleRequest = S['SettleRequest'];
 export type SettlementResponse = S['SettlementResponse'];
 
+export type DeadEvent = S['DeadEvent'];
+export type CatalogIconItem = S['IconResponse'];
+
+export type AdminAccount = S['AdminResponse'];
+export type AppointAdminRequest = S['AppointAdminRequest'];
+export type PermissionOption = S['PermissionResponse'];
+
 export type ResolveDisputeRequest = S['ResolveDisputeRequest'];
 export type CloseComplaintRequest = S['CloseRequest'];
 
 export type UserRole = NonNullable<UserResponse['roles']>[number];
 export type UserStatus = NonNullable<UserResponse['status']>;
+export type AdminPermission = NonNullable<UserResponse['permissions']>[number];
 export type VerificationStatus = NonNullable<MasterProfile['verificationStatus']>;
 export type DocumentType = NonNullable<MasterDocument['type']>;
 export type OrderStatus = NonNullable<OrderSummary['status']>;
@@ -65,8 +73,18 @@ export interface Page<T> {
 }
 
 export const ENUMS = {
-	userRole: ['CUSTOMER', 'MASTER', 'ADMIN'],
-	userStatus: ['ACTIVE', 'BLOCKED'],
+	userRole: ['CUSTOMER', 'MASTER', 'ADMIN', 'SUPER_ADMIN'],
+	userStatus: ['ACTIVE', 'BLOCKED', 'DELETED'],
+	adminPermission: [
+		'USERS',
+		'MASTERS',
+		'CATALOG',
+		'ORDERS',
+		'FINANCE',
+		'COMPLAINTS',
+		'SYSTEM',
+		'DELETE',
+	],
 	verificationStatus: ['NOT_SUBMITTED', 'PENDING', 'APPROVED', 'REJECTED'],
 	documentType: ['PASSPORT', 'SELFIE', 'CERTIFICATE', 'OTHER'],
 	orderStatus: [
@@ -90,6 +108,7 @@ export const ENUMS = {
 } as const satisfies {
 	userRole: readonly UserRole[];
 	userStatus: readonly UserStatus[];
+	adminPermission: readonly AdminPermission[];
 	verificationStatus: readonly VerificationStatus[];
 	documentType: readonly DocumentType[];
 	orderStatus: readonly OrderStatus[];

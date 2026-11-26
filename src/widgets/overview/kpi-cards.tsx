@@ -5,10 +5,12 @@ import { ArrowUpRightIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useQueries } from '@tanstack/react-query';
 import { ACTIVE_ORDER_STATUSES } from '@/entities/order/api';
-import { useCount } from '@/entities/system/api';
+import { DEAD_EVENTS_LIMIT, useCount, useDeadEvents } from '@/entities/system/api';
+import { useAccess } from '@/entities/user/api';
 import { http } from '@/shared/api/client';
 import type { Page } from '@/shared/api/types';
 import { routes, withQuery } from '@/shared/config/routes';
+import type { Access } from '@/shared/lib/access';
 import { cn } from '@/shared/lib/utils';
 import { Skeleton } from '@/shared/ui/kit/skeleton';
 
@@ -18,10 +20,12 @@ type KpiKey =
 	| 'openComplaints'
 	| 'inReviewComplaints'
 	| 'activeOrders'
-	| 'blockedUsers';
+	| 'blockedUsers'
+	| 'deadEvents';
 
 const KPIS: {
 	key: KpiKey;
+	access: Access;
 	path: string;
 	params: Record<string, string>;
 	href: string;
@@ -29,6 +33,7 @@ const KPIS: {
 }[] = [
 	{
 		key: 'pendingMasters',
+		access: 'MASTERS',
 		path: '/admin/masters',
 		params: { status: 'PENDING' },
 		href: withQuery(routes.masters, { status: 'PENDING' }),
@@ -36,6 +41,7 @@ const KPIS: {
 	},
 	{
 		key: 'disputes',
+		access: 'ORDERS',
 		path: '/admin/orders',
 		params: { status: 'DISPUTED' },
 		href: withQuery(routes.orders, { status: 'DISPUTED' }),
@@ -43,6 +49,7 @@ const KPIS: {
 	},
 	{
 		key: 'openComplaints',
+		access: 'COMPLAINTS',
 		path: '/admin/complaints',
 		params: { status: 'OPEN' },
 		href: withQuery(routes.complaints, { status: 'OPEN' }),
@@ -50,12 +57,14 @@ const KPIS: {
 	},
 	{
 		key: 'inReviewComplaints',
+		access: 'COMPLAINTS',
 		path: '/admin/complaints',
 		params: { status: 'IN_REVIEW' },
 		href: withQuery(routes.complaints, { status: 'IN_REVIEW' }),
 	},
 	{
 		key: 'blockedUsers',
+		access: 'USERS',
 		path: '/admin/users',
 		params: { status: 'BLOCKED' },
 		href: withQuery(routes.users, { status: 'BLOCKED' }),
@@ -68,12 +77,15 @@ function KpiCard({
 	href,
 	loading,
 	alert,
+	capped,
 }: {
 	label: string;
 	value?: number;
 	href: string;
 	loading: boolean;
 	alert?: boolean;
+	/** The value is a lower bound (list was cut at its limit). */
+	capped?: boolean;
 }) {
 	return (
 		<Link
@@ -94,6 +106,7 @@ function KpiCard({
 					)}
 				>
 					{value ?? '—'}
+					{capped && '+'}
 				</span>
 			)}
 		</Link>
@@ -127,15 +140,36 @@ function ActiveOrdersKpi() {
 	return <KpiCard label={t('activeOrders')} value={value} href={routes.orders} loading={loading} />;
 }
 
+/** Dead outbox events (list length, capped at the query limit). */
+function DeadEventsKpi() {
+	const t = useTranslations('overview.kpi');
+	const q = useDeadEvents();
+	return (
+		<KpiCard
+			label={t('deadEvents')}
+			value={q.data?.length}
+			href={routes.system}
+			loading={q.isLoading}
+			alert
+			capped={q.data?.length === DEAD_EVENTS_LIMIT}
+		/>
+	);
+}
+
+/** Each card only for an admin with its permission (plan §6.1). */
 export function KpiCards() {
+	const { can } = useAccess();
+	const visible = (k: (typeof KPIS)[number]) => can(k.access);
 	return (
 		<div className='grid gap-4 sm:grid-cols-2 xl:grid-cols-3'>
-			{KPIS.slice(0, 3).map(k => (
-				<CountKpi key={k.key} k={k} />
-			))}
-			<CountKpi k={KPIS[3]} />
-			<ActiveOrdersKpi />
-			<CountKpi k={KPIS[4]} />
+			{KPIS.slice(0, 4)
+				.filter(visible)
+				.map(k => (
+					<CountKpi key={k.key} k={k} />
+				))}
+			{can('ORDERS') && <ActiveOrdersKpi />}
+			{visible(KPIS[4]) && <CountKpi k={KPIS[4]} />}
+			{can('SYSTEM') && <DeadEventsKpi />}
 		</div>
 	);
 }
