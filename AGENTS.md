@@ -56,6 +56,10 @@ If `tsc`/`build` fails on `.next/dev/types/validator.ts` referencing deleted rou
 - `src/instrumentation.ts` validates `API_URL` at server start via `instrumentation.node.ts` (`process.exit` lives there because it can't be bundled for the Edge runtime); it is skipped during `next build`.
 - The OTP flow can't be exercised without a real admin phone (`ADMIN_PHONES` on the backend); for UI work, mock `/api/session/refresh` and `/api/v1/**` in the browser with a fake `usta_rt` cookie.
 
+## Update version
+
+Every big change on project update package.json version
+
 <!-- BEGIN:nextjs-agent-rules -->
 
 ## This is NOT the Next.js you know

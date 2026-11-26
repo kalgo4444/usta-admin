@@ -4,5 +4,7 @@
 		"deny": ["Bash(rm -rf *)", "Bash(rm -fr *)", "Read(.env)"],
 		"ask": []
 	},
-	"enabledPlugins": {}
+	"enabledPlugins": {
+		"frontend-design@anthropic-plugin-directory": true
+	}
 }
