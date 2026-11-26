@@ -6,10 +6,10 @@ services:
     ports:
       - '${PORT:-4010}:4010'
     environment:
-      # Backend origin (runtime, server-only). Empty = the default in src/shared/config/env.ts.
-      API_URL: ${API_URL:-}
+      # Backend origin (runtime, server-only, required: the server refuses to start without it).
+      API_URL: ${API_URL:?API_URL is required}
     healthcheck:
-      test: ['CMD', 'wget', '-qO-', 'http://127.0.0.1:4010/login']
+      test: ['CMD', 'wget', '-qO-', 'http://127.0.0.1:4010/api/health']
       interval: 30s
       timeout: 5s
       start_period: 20s

@@ -14,9 +14,23 @@ npm run dev               # http://localhost:4010
 | --------------------------------------- | ----------------------------------------------------------- |
 | `npm run dev` / `build` / `start`       | Next.js                                                     |
 | `npm run lint` · `typecheck` · `format` | ESLint · tsc · Prettier                                     |
-| `npm run gen:api`                       | Regenerate `src/shared/api/schema.d.ts` from `/v3/api-docs` |
+| `npm test`                              | Unit tests (Vitest)                                         |
+| `npm run build && npm run test:e2e`     | E2E (Playwright, backend mocked in the browser)             |
+| `API_URL=… npm run gen:api`             | Regenerate `src/shared/api/schema.d.ts` from `/v3/api-docs` |
 
 Login is SMS OTP; only users with the `ADMIN` role (backend `ADMIN_PHONES`) get in.
+
+## Deploy
+
+```bash
+API_URL=https://<backend-origin> docker compose up --build -d   # port ${PORT:-4010}
+```
+
+- `API_URL` is required at runtime (server-only); the server refuses to start without it.
+  The build doesn't need it.
+- Liveness probe: `GET /api/health` → `{"status":"ok"}`.
+- Server errors are logged as one JSON line each (`src/instrumentation.ts`).
+- Security headers (CSP without nonces, HSTS, Permissions-Policy) are set in `next.config.ts`.
 
 ## How it talks to the backend
 
