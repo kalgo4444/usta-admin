@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import { ScreenFallback } from '@/shared/ui/page-fallback';
-import { LoginPage } from '@/views/login/login-page';
+import { LoginPage } from '@/views/login';
 
 export const metadata: Metadata = { title: 'Login' };
 

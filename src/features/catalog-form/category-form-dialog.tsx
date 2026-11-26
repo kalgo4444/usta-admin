@@ -1,29 +1,27 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useQueryClient } from '@tanstack/react-query';
-import { WandSparklesIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Controller, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
-import { catalogApi, catalogKeys, useCatalogIcons } from '@/entities/catalog/api';
 import {
+	catalogApi,
+	catalogKeys,
 	buildCategoryTree,
 	flattenTree,
+	iconForSave,
 	localized,
 	selfAndDescendants,
-	SLUG_RE,
 	slugify,
-} from '@/entities/catalog/model';
-import { IconPicker } from '@/entities/catalog/ui';
-import { CatalogMedia } from '@/features/catalog-media/catalog-media';
+	IconPicker,
+} from '@/entities/catalog';
 import { invalidate } from '@/shared/api/invalidate';
 import type { Category } from '@/shared/api/types';
 import { useMutationErrorHandler } from '@/shared/api/use-mutation-error';
 import { useLocale } from '@/shared/i18n/locale';
-import { useEnumLabel } from '@/shared/i18n/use-enum';
 import { bindFieldErrors, toOptionalNumber } from '@/shared/lib/form';
 import { Button } from '@/shared/ui/kit/button';
 import { Input } from '@/shared/ui/kit/input';
@@ -42,6 +40,9 @@ import {
 	DialogTitle,
 } from '@/shared/ui/kit/dialog';
 import { Field } from '@/shared/ui/field';
+import { CatalogMedia } from './catalog-media';
+import { SlugField, StatusSelect } from './fields';
+import { catalogCommonFields, useCatalogSchemaMessages, useIconKeys } from './schema';
 
 const ROOT = '__root';
 
@@ -80,14 +81,13 @@ function CategoryForm({
 	const t = useTranslations('catalog');
 	const tc = useTranslations('common');
 	const te = useTranslations('errors');
-	const enumLabel = useEnumLabel();
+	const messages = useCatalogSchemaMessages();
 	const locale = useLocale();
 	const qc = useQueryClient();
 	const onError = useMutationErrorHandler();
 	const [autoSlug, setAutoSlug] = useState(!category);
 	const [customIcon, setCustomIcon] = useState(Boolean(category?.customIcon));
-	const icons = useCatalogIcons();
-	const iconKeys = useMemo(() => new Set((icons.data ?? []).map(i => i.key)), [icons.data]);
+	const iconKeys = useIconKeys();
 
 	// uz, ru, en are required (2–120); uzCyrl is transliterated from uz when empty.
 	const name = z
@@ -104,21 +104,8 @@ function CategoryForm({
 			.string()
 			.trim()
 			.max(120, te('maxLength', { max: 120 })),
-		slug: z
-			.string()
-			.trim()
-			.min(1, te('required'))
-			.max(80, te('maxLength', { max: 80 }))
-			.regex(SLUG_RE, t('slugInvalid')),
 		parentId: z.string(),
-		icon: z.string().refine(k => !k || !icons.data || iconKeys.has(k), t('unknownIcon')),
-		sortOrder: z
-			.number({ error: te('invalidNumber') })
-			.int()
-			.min(0)
-			.max(100000)
-			.optional(),
-		status: z.enum(['ACTIVE', 'INACTIVE']),
+		...catalogCommonFields(messages, iconKeys),
 	});
 	type Values = z.infer<typeof schema>;
 
@@ -137,19 +124,15 @@ function CategoryForm({
 	const form = useForm<Values>({ resolver: zodResolver(schema), defaultValues: defaults() });
 
 	const categoryId = category?.id;
-	const blocked = useMemo(
-		() => (categoryId ? selfAndDescendants(categories, categoryId) : new Set<string>()),
-		[categories, categoryId],
-	);
-	const options = useMemo(() => flattenTree(buildCategoryTree(categories)), [categories]);
+	const blocked = categoryId ? selfAndDescendants(categories, categoryId) : new Set<string>();
+	const options = flattenTree(buildCategoryTree(categories));
 
 	const submit = form.handleSubmit(async v => {
 		const body = {
 			name: { uz: v.nameUz, ru: v.nameRu, en: v.nameEn, uzCyrl: v.nameUzCyrl || undefined },
 			slug: v.slug,
 			parentId: v.parentId === ROOT ? undefined : v.parentId,
-			// Sending a key replaces an uploaded icon, so keep it out unless it was changed.
-			icon: customIcon && v.icon === (category?.icon ?? '') ? undefined : v.icon || undefined,
+			icon: iconForSave(v.icon, category?.icon, customIcon),
 			sortOrder: v.sortOrder,
 			status: v.status,
 		};
@@ -212,36 +195,15 @@ function CategoryForm({
 			>
 				<Input id='c-en' {...form.register('nameEn')} />
 			</Field>
-			<Field
-				label={t('slug')}
-				htmlFor='c-slug'
-				required
+			<SlugField
+				id='c-slug'
+				registration={form.register('slug', { onChange: () => setAutoSlug(false) })}
+				onGenerate={() => {
+					setAutoSlug(true);
+					form.setValue('slug', slugify(form.getValues('nameUz')), { shouldValidate: true });
+				}}
 				error={err.slug?.message}
-				hint={t('slugHint')}
-				className='sm:col-span-2'
-			>
-				<div className='flex gap-2'>
-					<Input
-						id='c-slug'
-						className='num'
-						{...form.register('slug', { onChange: () => setAutoSlug(false) })}
-					/>
-					<Button
-						type='button'
-						variant='secondary'
-						size='icon'
-						className='size-12'
-						aria-label={t('generate')}
-						title={t('generate')}
-						onClick={() => {
-							setAutoSlug(true);
-							form.setValue('slug', slugify(form.getValues('nameUz')), { shouldValidate: true });
-						}}
-					>
-						<WandSparklesIcon />
-					</Button>
-				</div>
-			</Field>
+			/>
 			<Field label={t('parent')} className='sm:col-span-2' error={err.parentId?.message}>
 				<Controller
 					control={form.control}
@@ -286,20 +248,7 @@ function CategoryForm({
 				<Controller
 					control={form.control}
 					name='status'
-					render={({ field }) => (
-						<Select value={field.value} onValueChange={field.onChange}>
-							<SelectTrigger>
-								<SelectValue />
-							</SelectTrigger>
-							<SelectContent>
-								{(['ACTIVE', 'INACTIVE'] as const).map(s => (
-									<SelectItem key={s} value={s}>
-										{enumLabel('CatalogStatus', s)}
-									</SelectItem>
-								))}
-							</SelectContent>
-						</Select>
-					)}
+					render={({ field }) => <StatusSelect value={field.value} onChange={field.onChange} />}
 				/>
 			</Field>
 			{category?.id && (

@@ -13,11 +13,11 @@ import type {
 	Transaction,
 } from '@/shared/api/types';
 
-export interface InvoicesParams {
+interface InvoicesParams {
 	period?: string;
 	masterId?: string;
 }
-export interface CommissionsParams {
+interface CommissionsParams {
 	masterId?: string;
 	period?: string;
 	status?: CommissionStatus;
@@ -25,7 +25,7 @@ export interface CommissionsParams {
 	size?: number;
 	sort?: string;
 }
-export interface TransactionsParams {
+interface TransactionsParams {
 	masterId: string;
 	page?: number;
 	size?: number;

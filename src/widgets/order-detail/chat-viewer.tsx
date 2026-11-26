@@ -1,14 +1,14 @@
 'use client';
 
-import { useMemo } from 'react';
 import { EyeIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useOrderChat } from '@/entities/order/api';
+import { useOrderChat } from '@/entities/order';
 import { formatDate } from '@/shared/lib/format';
 import { cn } from '@/shared/lib/utils';
 import { Button } from '@/shared/ui/kit/button';
 import { Skeleton } from '@/shared/ui/kit/skeleton';
 import { ErrorState } from '@/shared/ui/error-state';
+import { RemoteImage } from '@/shared/ui/remote-image';
 
 /** Read-only order chat. Customer messages on the left, master on the right. */
 export function ChatViewer({
@@ -28,12 +28,10 @@ export function ChatViewer({
 	const tc = useTranslations('common');
 	const q = useOrderChat(orderId);
 
-	const messages = useMemo(() => {
-		const seen = new Set<string>();
-		return (q.data?.pages.flat() ?? [])
-			.filter(m => (m.id && !seen.has(m.id) ? (seen.add(m.id), true) : false))
-			.sort((a, b) => (a.createdAt ?? '').localeCompare(b.createdAt ?? ''));
-	}, [q.data]);
+	const seen = new Set<string>();
+	const messages = (q.data?.pages.flat() ?? [])
+		.filter(m => (m.id && !seen.has(m.id) ? (seen.add(m.id), true) : false))
+		.sort((a, b) => (a.createdAt ?? '').localeCompare(b.createdAt ?? ''));
 
 	if (q.error) return <ErrorState error={q.error} onRetry={() => q.refetch()} className='py-6' />;
 	if (!q.data) return <Skeleton className='h-48' />;
@@ -84,8 +82,7 @@ export function ChatViewer({
 								>
 									{m.imageUrl && (
 										<a href={m.imageUrl} target='_blank' rel='noreferrer' className='block'>
-											{/* eslint-disable-next-line @next/next/no-img-element -- presigned URL */}
-											<img
+											<RemoteImage
 												src={m.imageUrl}
 												alt={t('chatImage')}
 												className='max-h-64 rounded-md object-contain'

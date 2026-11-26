@@ -11,7 +11,7 @@ import type {
 	ResolveDisputeRequest,
 } from '@/shared/api/types';
 
-export interface OrdersParams {
+interface OrdersParams {
 	status?: OrderStatus;
 	customerId?: string;
 	masterId?: string;

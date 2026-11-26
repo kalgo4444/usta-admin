@@ -2,9 +2,9 @@
 
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
-import { useAdminUsers } from '@/entities/user/api';
-import { UserBlockActions } from '@/features/block-user/user-block-actions';
-import { DeleteUserButton } from '@/features/delete-user/delete-user-button';
+import { useAdminUsers } from '@/entities/user';
+import { UserBlockActions } from '@/features/block-user';
+import { DeleteUserButton } from '@/features/delete-user';
 import { ENUMS, type AdminUser, type UserRole, type UserStatus } from '@/shared/api/types';
 import { routes, withQuery } from '@/shared/config/routes';
 import { useEnumLabel } from '@/shared/i18n/use-enum';

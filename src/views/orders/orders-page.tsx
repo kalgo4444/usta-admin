@@ -1,10 +1,9 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { useServices } from '@/entities/catalog/api';
-import { localized } from '@/entities/catalog/model';
-import { useAdminOrders } from '@/entities/order/api';
-import { MasterPicker } from '@/features/select-master/master-picker';
+import { useServices, localized } from '@/entities/catalog';
+import { useAdminOrders } from '@/entities/order';
+import { MasterPicker } from '@/features/select-master';
 import { ENUMS, type OrderStatus } from '@/shared/api/types';
 import { useLocale } from '@/shared/i18n/locale';
 import { useEnumLabel } from '@/shared/i18n/use-enum';
@@ -13,7 +12,7 @@ import { useTableParams } from '@/shared/lib/use-table-params';
 import { Tabs, TabsList, TabsTrigger } from '@/shared/ui/kit/tabs';
 import { FilterBar, FilterChip, FilterSelect } from '@/shared/ui/filter-bar';
 import { PageHeader } from '@/shared/ui/page-header';
-import { OrdersTable } from '@/widgets/order-list/orders-table';
+import { OrdersTable } from '@/widgets/order-list';
 
 export function OrdersPage() {
 	const t = useTranslations('orders');

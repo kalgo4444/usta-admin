@@ -5,10 +5,10 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { CircleAlertIcon, StarIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { masterName, useAdminMaster } from '@/entities/master/api';
-import { useAdminOrders } from '@/entities/order/api';
-import { useAccess } from '@/entities/user/api';
-import { MasterVerificationActions } from '@/features/verify-master/master-verification-actions';
+import { masterName, useAdminMaster } from '@/entities/master';
+import { useAdminOrders } from '@/entities/order';
+import { useAccess } from '@/entities/user';
+import { MasterVerificationActions } from '@/features/verify-master';
 import { routes, withQuery } from '@/shared/config/routes';
 import { formatDate } from '@/shared/lib/format';
 import { BackLink } from '@/shared/ui/back-link';
@@ -18,15 +18,15 @@ import { ErrorState } from '@/shared/ui/error-state';
 import { InfoRow } from '@/shared/ui/page-header';
 import { PhoneText } from '@/shared/ui/phone-text';
 import { StatusBadge } from '@/shared/ui/status-badge';
-import { DocumentsGallery } from '@/widgets/master-detail/documents-gallery';
-import { LocationMap } from '@/widgets/master-detail/location-map';
-import { MasterAvatar } from '@/widgets/master-detail/master-avatar';
 import {
+	DocumentsGallery,
+	LocationMap,
+	MasterAvatar,
 	MasterPortfolio,
 	MasterReviews,
 	MasterServices,
-} from '@/widgets/master-detail/master-extras';
-import { OrdersTable } from '@/widgets/order-list/orders-table';
+} from '@/widgets/master-detail';
+import { OrdersTable } from '@/widgets/order-list';
 
 export function MasterDetailPage() {
 	const { id } = useParams<{ id: string }>();

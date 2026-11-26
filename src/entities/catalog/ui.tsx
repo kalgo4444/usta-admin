@@ -1,12 +1,13 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { CheckIcon, ChevronDownIcon, SearchIcon, ShapesIcon, type LucideIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { cn } from '@/shared/lib/utils';
 import { fieldBase } from '@/shared/ui/kit/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/shared/ui/kit/popover';
 import { Skeleton } from '@/shared/ui/kit/skeleton';
+import { RemoteImage } from '@/shared/ui/remote-image';
 import { useCatalogIcons } from './api';
 
 /**
@@ -35,8 +36,7 @@ export function CatalogIcon({
 			/>
 		);
 	}
-	// eslint-disable-next-line @next/next/no-img-element -- presigned URL
-	return <img src={url} alt='' className={cn(size, 'rounded-xs object-contain')} />;
+	return <RemoteImage src={url} alt='' className={cn(size, 'rounded-xs object-contain')} />;
 }
 
 /** Searchable grid over `/public/catalog/icons`. Value is the icon `key` ('' = none). */
@@ -54,13 +54,11 @@ export function IconPicker({
 	const [open, setOpen] = useState(false);
 	const [search, setSearch] = useState('');
 
-	const icons = useMemo(() => q.data ?? [], [q.data]);
-	const filtered = useMemo(() => {
-		const s = search.trim().toLowerCase();
-		return icons.filter(
-			i => !s || i.key?.toLowerCase().includes(s) || i.name?.toLowerCase().includes(s),
-		);
-	}, [icons, search]);
+	const icons = q.data ?? [];
+	const s = search.trim().toLowerCase();
+	const filtered = icons.filter(
+		i => !s || i.key?.toLowerCase().includes(s) || i.name?.toLowerCase().includes(s),
+	);
 	const selected = icons.find(i => i.key === value);
 
 	const pick = (key: string) => {

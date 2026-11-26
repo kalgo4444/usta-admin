@@ -8,7 +8,7 @@ import { useTranslations } from 'next-intl';
 import { Controller, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
-import { adminApi, adminKeys, usePermissionOptions } from '@/entities/admin/api';
+import { adminApi, adminKeys, usePermissionOptions } from '@/entities/admin';
 import { invalidate } from '@/shared/api/invalidate';
 import { ENUMS, type AdminAccount, type AdminPermission } from '@/shared/api/types';
 import { useMutationErrorHandler } from '@/shared/api/use-mutation-error';

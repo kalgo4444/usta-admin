@@ -1,6 +1,5 @@
 'use client';
 
-import { useCallback, useMemo } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import type { SortingState } from '@tanstack/react-table';
 
@@ -32,42 +31,32 @@ export function useTableParams<F extends string>({
 	const size = Math.min(100, Math.max(1, Number(sp.get('size') ?? defaultSize) || defaultSize));
 	const sort = sp.get('sort') ?? defaultSort ?? '';
 
-	const filterKey = filters.join('|');
-	const values = useMemo(() => {
-		const out = {} as Record<F, string | undefined>;
-		for (const f of filterKey.split('|') as F[]) out[f] = sp.get(f) ?? defaults?.[f] ?? undefined;
-		return out;
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [sp, filterKey]);
-
+	// Memoised by the React Compiler: no useMemo/useCallback needed here.
+	const values = {} as Record<F, string | undefined>;
 	/** Values ready for the API: ALL/empty → undefined. */
-	const apiFilters = useMemo(() => {
-		const out = {} as Record<F, string | undefined>;
-		for (const [k, v] of Object.entries(values) as [F, string | undefined][])
-			out[k] = v && v !== ALL ? v : undefined;
-		return out;
-	}, [values]);
+	const apiFilters = {} as Record<F, string | undefined>;
+	for (const f of filters) {
+		const v = sp.get(f) ?? defaults?.[f] ?? undefined;
+		values[f] = v;
+		apiFilters[f] = v && v !== ALL ? v : undefined;
+	}
 
-	const update = useCallback(
-		(patch: Record<string, string | number | undefined | null>, resetPage = true) => {
-			const next = new URLSearchParams(sp.toString());
-			for (const [k, v] of Object.entries(patch)) {
-				if (v === undefined || v === null || v === '') next.delete(k);
-				else next.set(k, String(v));
-			}
-			if (resetPage && !('page' in patch)) next.delete('page');
-			if (next.get('page') === '0') next.delete('page');
-			const qs = next.toString();
-			router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
-		},
-		[sp, router, pathname],
-	);
+	const update = (patch: Record<string, string | number | undefined | null>, resetPage = true) => {
+		const next = new URLSearchParams(sp.toString());
+		for (const [k, v] of Object.entries(patch)) {
+			if (v === undefined || v === null || v === '') next.delete(k);
+			else next.set(k, String(v));
+		}
+		if (resetPage && !('page' in patch)) next.delete('page');
+		if (next.get('page') === '0') next.delete('page');
+		const qs = next.toString();
+		router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+	};
 
-	const sorting: SortingState = useMemo(() => {
-		if (!sort) return [];
-		const [id, dir] = sort.split(',');
-		return [{ id, desc: (dir ?? '').toUpperCase() === 'DESC' }];
-	}, [sort]);
+	const [sortId, sortDir] = sort.split(',');
+	const sorting: SortingState = sort
+		? [{ id: sortId, desc: (sortDir ?? '').toUpperCase() === 'DESC' }]
+		: [];
 
 	return {
 		page,

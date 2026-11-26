@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import { PageFallback } from '@/shared/ui/page-fallback';
-import { MasterDetailPage } from '@/views/masters/master-detail-page';
+import { MasterDetailPage } from '@/views/masters';
 
 export const metadata: Metadata = { title: 'Master' };
 

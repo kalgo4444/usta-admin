@@ -121,3 +121,12 @@ export function slugify(input: string) {
 }
 
 export const SLUG_RE = /^[a-z0-9]+(-[a-z0-9]+)*$/;
+
+/**
+ * The `icon` key to send on save. Sending a key replaces an uploaded icon, so while one is
+ * set (`customIcon`) an unchanged key is left out.
+ */
+export function iconForSave(value: string, original: string | undefined, customIcon: boolean) {
+	if (customIcon && value === (original ?? '')) return undefined;
+	return value || undefined;
+}

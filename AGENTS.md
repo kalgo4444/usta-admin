@@ -19,7 +19,7 @@ npx playwright test e2e/masters.spec.ts -g 'approving'      # one spec / one tes
 
 Docker: `docker compose up --build` serves the standalone Next build on `${PORT:-4010}`; `API_URL` is a runtime, server-only env var and is required: `src/instrumentation.ts` refuses to start the server without it (the build doesn't need it). Healthcheck: `GET /api/health`.
 
-Tests: `npm test` (Vitest, `src/**/*.test.ts`, node env — no DOM, so hooks/components are covered by E2E) and `npm run test:e2e` (Playwright in `e2e/`, needs `npm run build` first; it runs `next start` on port 4020 and mocks `/api/session/*` + `/api/v1/**` in the browser via `e2e/mock-api.ts`, so no backend is needed; Playwright matches the most recently registered route first, so register specific mocks after `mockAdminSession`). npm is the package manager (`package-lock.json`); `bun.lock` is stale.
+Tests: `npm test` (Vitest, `src/**/*.test.ts`, node env — no DOM, so hooks/components are covered by E2E) and `npm run test:e2e` (Playwright in `e2e/`, needs `npm run build` first; it runs `next start` on port 4020 and mocks `/api/session/*` + `/api/v1/**` in the browser via `e2e/mock-api.ts`, so no backend is needed; Playwright matches the most recently registered route first, so register specific mocks after `mockAdminSession`). npm is the package manager (`package-lock.json`).
 
 If `tsc`/`build` fails on `.next/dev/types/validator.ts` referencing deleted routes, delete the stale files in `.next/dev/types/` (the project denies `rm -rf`, so remove the files individually).
 
@@ -34,6 +34,9 @@ If `tsc`/`build` fails on `.next/dev/types/validator.ts` referencing deleted rou
 
 **Layering (FSD-style).** `shared` → `entities` → `features` → `widgets` → `views` → `app`; import only downward.
 
+- Each slice has an `index.ts` public API: import other slices only through it (`@/entities/catalog`, never `@/entities/catalog/api`), use relative imports inside a slice, and never import a sibling slice on the same layer. `shared` has no barrels (import `@/shared/ui/kit/button` etc.). ESLint enforces all of this (`no-restricted-imports` in `eslint.config.mjs`). `package.json` declares `"sideEffects": ["*.css"]` so Turbopack tree-shakes the barrels — a module that must run on import (other than CSS) has to be added there.
+- Dialogs that only open on click (catalog forms, admin form, settle invoice) are `next/dynamic` imports mounted on first open (`useOpenedOnce`, `shared/lib/use-opened-once.ts`), which keeps zod + RHF out of the list pages' initial JS.
+
 - `src/app`: routes are thin server components that render `<Suspense><XPage/></Suspense>`. With `cacheComponents: true`, anything using `useSearchParams`/`useParams` must sit under Suspense or `next build` fails (dev won't catch it).
 - `src/views` holds the page compositions (named `views`, not `pages`, to avoid Next's `pages/` dir).
 - `src/entities/<domain>/api.ts`: TanStack Query hooks + plain API objects. Query keys follow `['admin', <resource>, params]`; mutations call `invalidate()` (`shared/api/invalidate.ts`), which also invalidates the `['admin','count']` KPI counters. Errors from mutations go through `useMutationErrorHandler` (409 → toast + refetch all `admin` queries).
@@ -47,9 +50,9 @@ If `tsc`/`build` fails on `.next/dev/types/validator.ts` referencing deleted rou
 
 ## Gotchas
 
-- Master document, portfolio and order attachment URLs are presigned and expire: those queries use `staleTime: 0` / `gcTime: 0` — don't add caching.
+- Master document, portfolio and order attachment URLs are presigned and expire: those queries use `staleTime: 0` / `gcTime: 0` — don't add caching. Render them with `RemoteImage` (`shared/ui/remote-image.tsx`, lazy `<img>`), not `next/image`, whose optimizer would cache an expiring URL.
 - `/admin/masters` has no name filter; the master picker and finance name lookups search client-side over the paged directory (`useMasterDirectory`).
-- Catalog delete is an archive (`CATALOG`+`DELETE`); a non-empty category answers `409 CATEGORY_NOT_EMPTY` and is retried with `?cascade=true`. Saving a category/service with an `icon` key removes an uploaded icon, so the forms omit an unchanged key when `customIcon` is set. Only a SUPER_ADMIN may block/delete an ADMIN; nobody may touch a SUPER_ADMIN (`entities/user/model.ts`).
+- Catalog delete is an archive (`CATALOG`+`DELETE`); a non-empty category answers `409 CATEGORY_NOT_EMPTY` and is retried with `?cascade=true`. Saving a category/service with an `icon` key removes an uploaded icon, so the forms (`features/catalog-form`) omit an unchanged key when `customIcon` is set (`iconForSave` in `entities/catalog/model.ts`). Only a SUPER_ADMIN may block/delete an ADMIN; nobody may touch a SUPER_ADMIN (`entities/user/model.ts`).
 - `react-hook-form`'s `watch()` breaks the React Compiler lint rule — use `useWatch`. Form dialogs are split so the form component mounts per open (fresh defaults instead of reset effects); avoid reading refs during render.
 - `DataTable` uses `"use no memo"` because the TanStack table instance is mutable.
 - CSP is a static header in `next.config.ts`, deliberately without nonces (nonces force dynamic rendering and break PPR). A new external origin (iframe, fetch, font) must be added there; `connect-src` is `'self'` because all API traffic goes through the proxy.

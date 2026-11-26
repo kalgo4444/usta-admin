@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import { PageFallback } from '@/shared/ui/page-fallback';
-import { InvoicesPage } from '@/views/finance/invoices-page';
+import { InvoicesPage } from '@/views/finance';
 
 export const metadata: Metadata = { title: 'Invoices' };
 

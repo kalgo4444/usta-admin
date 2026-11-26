@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
 import { LoaderCircleIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useMe, userKeys } from '@/entities/user/api';
+import { useMe, userKeys } from '@/entities/user';
 import { ApiError, toApiError } from '@/shared/api/errors';
 import { logout, sessionStore } from '@/shared/api/session';
 import { routes } from '@/shared/config/routes';

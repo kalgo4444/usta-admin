@@ -1,9 +1,9 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { CheckIcon, ChevronDownIcon, SearchIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { masterName, useMasterDirectory } from '@/entities/master/api';
+import { masterName, useMasterDirectory } from '@/entities/master';
 import { formatPhone } from '@/shared/lib/format';
 import { cn } from '@/shared/lib/utils';
 import { Button } from '@/shared/ui/kit/button';
@@ -13,14 +13,12 @@ import { Skeleton } from '@/shared/ui/kit/skeleton';
 /** id → display name, built from the client-side master directory. */
 export function useMasterNames() {
 	const q = useMasterDirectory();
-	return useMemo(() => {
-		const m = new Map<string, string>();
-		for (const p of q.data?.pages ?? [])
-			for (const it of p.items ?? [])
-				if (it.profile?.userId)
-					m.set(it.profile.userId, masterName(it.profile, formatPhone(it.phone)));
-		return m;
-	}, [q.data]);
+	const names = new Map<string, string>();
+	for (const p of q.data?.pages ?? [])
+		for (const it of p.items ?? [])
+			if (it.profile?.userId)
+				names.set(it.profile.userId, masterName(it.profile, formatPhone(it.phone)));
+	return names;
 }
 
 /** Searchable master select (name or phone). `/admin/masters` has no text filter, so search is client-side. */
@@ -45,17 +43,15 @@ export function MasterPicker({
 	const [open, setOpen] = useState(false);
 	const [search, setSearch] = useState('');
 
-	const all = useMemo(() => (q.data?.pages ?? []).flatMap(p => p.items ?? []), [q.data]);
-	const filtered = useMemo(() => {
-		const s = search.trim().toLowerCase();
-		const digits = s.replace(/\D/g, '');
-		return all.filter(
-			m =>
-				!s ||
-				m.profile?.fullName?.toLowerCase().includes(s) ||
-				(digits.length >= 3 && m.phone?.replace(/\D/g, '').includes(digits)),
-		);
-	}, [all, search]);
+	const all = (q.data?.pages ?? []).flatMap(p => p.items ?? []);
+	const s = search.trim().toLowerCase();
+	const digits = s.replace(/\D/g, '');
+	const filtered = all.filter(
+		m =>
+			!s ||
+			m.profile?.fullName?.toLowerCase().includes(s) ||
+			(digits.length >= 3 && m.phone?.replace(/\D/g, '').includes(digits)),
+	);
 
 	const selected = all.find(m => m.profile?.userId === value);
 	const label = selected

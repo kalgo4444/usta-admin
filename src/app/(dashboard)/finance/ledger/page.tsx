@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import { PageFallback } from '@/shared/ui/page-fallback';
-import { LedgerPage } from '@/views/finance/ledger-page';
+import { LedgerPage } from '@/views/finance';
 
 export const metadata: Metadata = { title: 'Ledger' };
 

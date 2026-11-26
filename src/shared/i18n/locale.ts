@@ -4,7 +4,7 @@ import { useSyncExternalStore } from 'react';
 
 export const LOCALES = ['uz', 'ru'] as const;
 export type Locale = (typeof LOCALES)[number];
-export const DEFAULT_LOCALE: Locale = 'uz';
+const DEFAULT_LOCALE: Locale = 'uz';
 
 const KEY = 'usta-admin-locale';
 const listeners = new Set<() => void>();

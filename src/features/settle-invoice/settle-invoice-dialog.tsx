@@ -7,7 +7,7 @@ import { useTranslations } from 'next-intl';
 import { useForm, useWatch } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
-import { financeApi, invoiceDebt } from '@/entities/finance/api';
+import { financeApi, invoiceDebt } from '@/entities/finance';
 import { invalidate } from '@/shared/api/invalidate';
 import type { Invoice } from '@/shared/api/types';
 import { useMutationErrorHandler } from '@/shared/api/use-mutation-error';

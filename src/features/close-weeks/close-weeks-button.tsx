@@ -5,7 +5,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { CalendarCheckIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
-import { financeApi } from '@/entities/finance/api';
+import { financeApi } from '@/entities/finance';
 import { invalidate } from '@/shared/api/invalidate';
 import { useMutationErrorHandler } from '@/shared/api/use-mutation-error';
 import { Button } from '@/shared/ui/kit/button';

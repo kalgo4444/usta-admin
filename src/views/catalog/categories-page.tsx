@@ -1,32 +1,43 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { ChevronRightIcon, FolderIcon, PencilIcon, PlusIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useCategories } from '@/entities/catalog/api';
-import { buildCategoryTree, localized, type CategoryNode } from '@/entities/catalog/model';
-import { CatalogIcon } from '@/entities/catalog/ui';
-import { CategoryFormDialog } from '@/features/category-form/category-form-dialog';
-import { DeleteCatalogItemButton } from '@/features/delete-catalog-item/delete-catalog-item';
+import {
+	useCategories,
+	buildCategoryTree,
+	localized,
+	type CategoryNode,
+	CatalogIcon,
+} from '@/entities/catalog';
+import dynamic from 'next/dynamic';
+import { DeleteCatalogItemButton } from '@/features/delete-catalog-item';
 import type { Category } from '@/shared/api/types';
 import { useLocale } from '@/shared/i18n/locale';
 import { cn } from '@/shared/lib/utils';
+import { useOpenedOnce } from '@/shared/lib/use-opened-once';
 import { Button } from '@/shared/ui/kit/button';
 import { Skeleton } from '@/shared/ui/kit/skeleton';
 import { EmptyState, ErrorState } from '@/shared/ui/error-state';
 import { PageHeader } from '@/shared/ui/page-header';
 import { StatusBadge } from '@/shared/ui/status-badge';
 
+/** Loaded on first open: keeps zod + react-hook-form out of the page's initial JS. */
+const CategoryFormDialog = dynamic(() =>
+	import('@/features/catalog-form').then(m => m.CategoryFormDialog),
+);
+
 type DialogState = { category?: Category; parentId?: string } | null;
 
 export function CategoriesPage() {
 	const t = useTranslations('catalog');
 	const q = useCategories();
-	const tree = useMemo(() => buildCategoryTree(q.data ?? []), [q.data]);
+	const tree = buildCategoryTree(q.data ?? []);
 	const [expanded, setExpanded] = useState<Set<string>>(new Set());
 	const [dialog, setDialog] = useState<DialogState>(null);
+	const dialogMounted = useOpenedOnce(dialog !== null);
 
-	const allIds = useMemo(() => (q.data ?? []).map(c => c.id!).filter(Boolean), [q.data]);
+	const allIds = (q.data ?? []).map(c => c.id!).filter(Boolean);
 	const toggle = (id: string) =>
 		setExpanded(s => {
 			const n = new Set(s);
@@ -85,13 +96,15 @@ export function CategoriesPage() {
 					</ul>
 				)}
 			</div>
-			<CategoryFormDialog
-				open={dialog !== null}
-				onOpenChange={o => !o && setDialog(null)}
-				categories={q.data ?? []}
-				category={dialog?.category}
-				defaultParentId={dialog?.parentId}
-			/>
+			{dialogMounted && (
+				<CategoryFormDialog
+					open={dialog !== null}
+					onOpenChange={o => !o && setDialog(null)}
+					categories={q.data ?? []}
+					category={dialog?.category}
+					defaultParentId={dialog?.parentId}
+				/>
+			)}
 		</div>
 	);
 }
