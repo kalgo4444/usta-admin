@@ -20,8 +20,7 @@ const LOCALE_NAMES: Record<Locale, string> = { uz: "O'zbekcha", ru: 'Русск�
 export function PreferencesMenu() {
 	const t = useTranslations('common');
 	const locale = useLocale();
-	const { theme, setTheme, resolvedTheme } = useTheme();
-	const Icon = resolvedTheme === 'dark' ? MoonIcon : SunIcon;
+	const { theme, setTheme } = useTheme();
 
 	return (
 		<DropdownMenu>
@@ -29,7 +28,9 @@ export function PreferencesMenu() {
 				<Button variant='ghost' size='sm' className='gap-1.5'>
 					<LanguagesIcon />
 					<span className='uppercase'>{locale}</span>
-					<Icon className='ml-1' />
+					{/* CSS picks the icon: the server doesn't know the theme (hydration) */}
+					<SunIcon className='ml-1 dark:hidden' />
+					<MoonIcon className='ml-1 hidden dark:block' />
 				</Button>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent align='end'>
