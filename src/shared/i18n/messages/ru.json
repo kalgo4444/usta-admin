@@ -41,7 +41,8 @@
 		"removeFilter": "Убрать фильтр",
 		"typeToConfirm": "Введите «{word}» для подтверждения",
 		"km": "{value} км",
-		"meters": "{value} м"
+		"meters": "{value} м",
+		"delete": "Удалить"
 	},
 	"errors": {
 		"title": "Произошла ошибка",
@@ -58,11 +59,22 @@
 		"traceId": "Trace ID: {id}",
 		"required": "Обязательное поле",
 		"maxLength": "Не более {max} символов",
-		"invalidNumber": "Неверное число"
+		"invalidNumber": "Неверное число",
+		"minLength": "Минимум {min} символа",
+		"minValue": "Не меньше {min}"
 	},
 	"enums": {
-		"UserRole": { "CUSTOMER": "Клиент", "MASTER": "Мастер", "ADMIN": "Админ" },
-		"UserStatus": { "ACTIVE": "Активен", "BLOCKED": "Заблокирован" },
+		"UserRole": {
+			"CUSTOMER": "Клиент",
+			"MASTER": "Мастер",
+			"ADMIN": "Админ",
+			"SUPER_ADMIN": "Супер-админ"
+		},
+		"UserStatus": {
+			"ACTIVE": "Активен",
+			"BLOCKED": "Заблокирован",
+			"DELETED": "Удалён"
+		},
 		"VerificationStatus": {
 			"NOT_SUBMITTED": "Не отправлено",
 			"PENDING": "На проверке",
@@ -108,7 +120,10 @@
 			"RESOLVED": "Решена",
 			"REJECTED": "Отклонена"
 		},
-		"CatalogStatus": { "ACTIVE": "Активна", "INACTIVE": "Неактивна" },
+		"CatalogStatus": {
+			"ACTIVE": "Активна",
+			"INACTIVE": "Неактивна"
+		},
 		"TransactionType": {
 			"COMMISSION_CHARGE": "Начисление комиссии",
 			"COMMISSION_REVERSAL": "Возврат комиссии",
@@ -120,6 +135,16 @@
 			"INVOICED": "Выставлена",
 			"PAID": "Оплачена",
 			"CANCELLED": "Отменена"
+		},
+		"AdminPermission": {
+			"USERS": "Пользователи",
+			"MASTERS": "Мастера",
+			"CATALOG": "Каталог",
+			"ORDERS": "Заказы",
+			"FINANCE": "Финансы",
+			"COMPLAINTS": "Жалобы",
+			"SYSTEM": "Система",
+			"DELETE": "Удаление"
 		}
 	},
 	"nav": {
@@ -136,7 +161,8 @@
 		"commissions": "Комиссии",
 		"ledger": "Леджер",
 		"reconciliation": "Сверка",
-		"system": "Система"
+		"system": "Система",
+		"admins": "Администраторы"
 	},
 	"auth": {
 		"title": "Вход в админ-панель",
@@ -170,7 +196,8 @@
 			"openComplaints": "Открытые жалобы",
 			"inReviewComplaints": "Жалобы на рассмотрении",
 			"activeOrders": "Активные заказы",
-			"blockedUsers": "Заблокированные пользователи"
+			"blockedUsers": "Заблокированные пользователи",
+			"deadEvents": "Недоставленные события"
 		},
 		"reconciliation": "Сверка (последние 7 дней)",
 		"reconOk": "Всё сходится",
@@ -199,7 +226,11 @@
 		"blockedToast": "Пользователь заблокирован",
 		"unblockedToast": "Пользователь разблокирован",
 		"masterProfile": "Профиль мастера",
-		"orders": "Заказы"
+		"orders": "Заказы",
+		"delete": "Удалить",
+		"deleteTitle": "Удаление аккаунта",
+		"deleteDescription": "Аккаунт {phone} будет анонимизирован: телефон, имя, адреса, документы и фото удаляются, история заказов и комиссий сохраняется без владельца. Это необратимо.",
+		"deletedToast": "Аккаунт удалён"
 	},
 	"masters": {
 		"title": "Мастера",
@@ -301,7 +332,8 @@
 		"priceRequired": "В заказе нет цены — укажите итоговую цену",
 		"resolvedToast": "Спор решён",
 		"filterMaster": "Мастер",
-		"filterCustomer": "Клиент"
+		"filterCustomer": "Клиент",
+		"chatImage": "Изображение в чате"
 	},
 	"complaints": {
 		"title": "Жалобы",
@@ -359,7 +391,23 @@
 		"savedToast": "Сохранено",
 		"createdToast": "Создано",
 		"children": "вложенных: {count}",
-		"noDelete": "Вместо удаления установите статус «Неактивна»."
+		"statusHint": "Чтобы временно скрыть, сделайте статус «Неактивен».",
+		"uzCyrlHint": "Если пусто — транслитерируется с латиницы",
+		"unknownIcon": "Такой иконки нет в наборе — выберите другую",
+		"iconNone": "Без иконки",
+		"iconSearch": "Поиск иконки",
+		"noIcons": "Иконки не найдены",
+		"media": "Изображение и иконка",
+		"image": "Изображение",
+		"customIcon": "Своя иконка",
+		"customIconHint": "Загруженная иконка важнее иконки из набора. Если выбрать другую иконку из набора и сохранить, загруженная удалится. Изменения сохраняются сразу.",
+		"deletedToast": "Удалено",
+		"deleteCategoryTitle": "Удаление категории",
+		"deleteCategoryDescription": "«{name}» будет удалена (архивирована) и пропадёт из списка.",
+		"deleteCascadeTitle": "Категория не пуста",
+		"deleteCascadeHint": "Если продолжить, удалится вся ветка вместе с услугами.",
+		"deleteServiceTitle": "Удаление услуги",
+		"deleteServiceDescription": "«{name}» будет удалена вместе с ценами мастеров на неё; старые заказы не изменятся."
 	},
 	"finance": {
 		"invoices": "Счета",
@@ -376,7 +424,7 @@
 		"overdue": "Просрочено",
 		"settle": "Отметить оплату",
 		"settleTitle": "Отметить оплату",
-		"settleHint": "Сумма должна равняться неоплаченному остатку.",
+		"settleHint": "Сумма должна быть равна долгу по счёту (переплата уже учтена).",
 		"amount": "Сумма",
 		"reference": "Референс (номер чека)",
 		"settledToast": "Оплата учтена. Остаток: {balance}",
@@ -415,7 +463,8 @@
 		"orderStatus": "Статус заказа",
 		"orderCommission": "Комиссия заказа",
 		"reportedCommission": "В отчёте",
-		"ledgerNet": "Леджер нетто"
+		"ledgerNet": "Леджер нетто",
+		"onHold": "Удержано"
 	},
 	"system": {
 		"title": "Система",
@@ -429,6 +478,57 @@
 		"reindexDescription": "Все мастера и услуги будут заново записаны в поисковый индекс. Это может занять несколько минут и временно замедлить поиск.",
 		"reindexTitle": "Подтвердите перестройку индекса",
 		"reindexDoneToast": "Индекс перестроен",
-		"result": "Результат"
+		"result": "Результат",
+		"outbox": "Недоставленные события",
+		"outboxDescription": "Внутренние события, у которых закончились попытки доставки (сначала старые).",
+		"outboxEmpty": "Всё доставлено",
+		"outboxLimited": "Показаны только первые {count}",
+		"eventType": "Событие",
+		"aggregate": "Объект",
+		"attempts": "Попытки",
+		"lastError": "Последняя ошибка",
+		"createdAt": "Создано",
+		"retry": "Поставить в очередь",
+		"retryTitle": "Повторная отправка событий",
+		"retryDescription": "Все недоставленные события снова попадут в очередь. Сначала убедитесь, что причина ошибки устранена.",
+		"retriedToast": "В очередь поставлено событий: {count}"
+	},
+	"upload": {
+		"upload": "Загрузить",
+		"replace": "Заменить",
+		"remove": "Убрать",
+		"uploading": "Загрузка…",
+		"rules": "{types} · до {max} · {min}–{maxPx} px",
+		"invalidType": "Тип файла не разрешён. Можно: {types}",
+		"tooLarge": "Размер файла — не больше {max}",
+		"dimensions": "Стороны изображения — от {min} до {max} px",
+		"notSquare": "Иконка должна быть квадратной",
+		"unreadable": "Не удалось прочитать изображение",
+		"uploadedToast": "Загружено",
+		"removedToast": "Удалено"
+	},
+	"admins": {
+		"title": "Администраторы",
+		"subtitle": "Администраторы и их права",
+		"appoint": "Назначить админа",
+		"appointTitle": "Назначение администратора",
+		"appointDescription": "По номеру телефона. Если аккаунта нет, он будет создан.",
+		"editTitle": "Изменение прав",
+		"phone": "Телефон",
+		"invalidPhone": "Формат: +998 XX XXX XX XX",
+		"superAdmin": "Супер-админ",
+		"allPermissions": "Все права",
+		"permissions": "Права",
+		"permissionsRequired": "Выберите хотя бы одно право",
+		"status": "Статус",
+		"lastLogin": "Последний вход",
+		"createdAt": "Добавлен",
+		"tokenNote": "Права заменяются полностью и действуют сразу: админ не разлогинится, со следующего запроса продолжит с новыми правами.",
+		"appointedToast": "Администратор назначен",
+		"savedToast": "Права сохранены",
+		"remove": "Снять права админа",
+		"removeTitle": "Снять права администратора",
+		"removeDescription": "{phone} больше не сможет войти в админку. Роли клиента/мастера сохранятся.",
+		"removedToast": "Права администратора сняты"
 	}
 }

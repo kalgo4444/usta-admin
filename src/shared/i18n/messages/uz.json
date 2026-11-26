@@ -41,7 +41,8 @@
 		"removeFilter": "Filtrni olib tashlash",
 		"typeToConfirm": "Tasdiqlash uchun \"{word}\" deb yozing",
 		"km": "{value} km",
-		"meters": "{value} m"
+		"meters": "{value} m",
+		"delete": "O'chirish"
 	},
 	"errors": {
 		"title": "Xatolik yuz berdi",
@@ -58,11 +59,22 @@
 		"traceId": "Trace ID: {id}",
 		"required": "Majburiy maydon",
 		"maxLength": "Ko'pi bilan {max} belgi",
-		"invalidNumber": "Noto'g'ri raqam"
+		"invalidNumber": "Noto'g'ri raqam",
+		"minLength": "Kamida {min} belgi",
+		"minValue": "Kamida {min}"
 	},
 	"enums": {
-		"UserRole": { "CUSTOMER": "Mijoz", "MASTER": "Usta", "ADMIN": "Admin" },
-		"UserStatus": { "ACTIVE": "Faol", "BLOCKED": "Bloklangan" },
+		"UserRole": {
+			"CUSTOMER": "Mijoz",
+			"MASTER": "Usta",
+			"ADMIN": "Admin",
+			"SUPER_ADMIN": "Super admin"
+		},
+		"UserStatus": {
+			"ACTIVE": "Faol",
+			"BLOCKED": "Bloklangan",
+			"DELETED": "O'chirilgan"
+		},
 		"VerificationStatus": {
 			"NOT_SUBMITTED": "Yuborilmagan",
 			"PENDING": "Kutilmoqda",
@@ -108,7 +120,10 @@
 			"RESOLVED": "Hal qilingan",
 			"REJECTED": "Rad etilgan"
 		},
-		"CatalogStatus": { "ACTIVE": "Faol", "INACTIVE": "Nofaol" },
+		"CatalogStatus": {
+			"ACTIVE": "Faol",
+			"INACTIVE": "Nofaol"
+		},
 		"TransactionType": {
 			"COMMISSION_CHARGE": "Komissiya hisoblandi",
 			"COMMISSION_REVERSAL": "Komissiya qaytarildi",
@@ -120,6 +135,16 @@
 			"INVOICED": "Invoice qilingan",
 			"PAID": "To'langan",
 			"CANCELLED": "Bekor qilingan"
+		},
+		"AdminPermission": {
+			"USERS": "Foydalanuvchilar",
+			"MASTERS": "Ustalar",
+			"CATALOG": "Katalog",
+			"ORDERS": "Buyurtmalar",
+			"FINANCE": "Moliya",
+			"COMPLAINTS": "Shikoyatlar",
+			"SYSTEM": "Tizim",
+			"DELETE": "O'chirish"
 		}
 	},
 	"nav": {
@@ -136,7 +161,8 @@
 		"commissions": "Komissiyalar",
 		"ledger": "Ledger",
 		"reconciliation": "Solishtirish",
-		"system": "Tizim"
+		"system": "Tizim",
+		"admins": "Adminlar"
 	},
 	"auth": {
 		"title": "Admin panelga kirish",
@@ -170,7 +196,8 @@
 			"openComplaints": "Ochiq shikoyatlar",
 			"inReviewComplaints": "Ko'rib chiqilayotgan shikoyatlar",
 			"activeOrders": "Faol buyurtmalar",
-			"blockedUsers": "Bloklangan foydalanuvchilar"
+			"blockedUsers": "Bloklangan foydalanuvchilar",
+			"deadEvents": "Yetkazilmagan eventlar"
 		},
 		"reconciliation": "Solishtirish (oxirgi 7 kun)",
 		"reconOk": "Hammasi mos",
@@ -199,7 +226,11 @@
 		"blockedToast": "Foydalanuvchi bloklandi",
 		"unblockedToast": "Foydalanuvchi blokdan chiqarildi",
 		"masterProfile": "Usta profili",
-		"orders": "Buyurtmalari"
+		"orders": "Buyurtmalari",
+		"delete": "O'chirish",
+		"deleteTitle": "Hisobni o'chirish",
+		"deleteDescription": "{phone} hisobi anonimlashtiriladi: telefon, ism, manzillar, hujjat va rasmlar o'chiriladi, buyurtma va komissiya tarixi egasiz saqlanadi. Buni qaytarib bo'lmaydi.",
+		"deletedToast": "Hisob o'chirildi"
 	},
 	"masters": {
 		"title": "Ustalar",
@@ -301,7 +332,8 @@
 		"priceRequired": "Buyurtmada narx yo'q — yakuniy narxni kiriting",
 		"resolvedToast": "Nizo hal qilindi",
 		"filterMaster": "Usta",
-		"filterCustomer": "Mijoz"
+		"filterCustomer": "Mijoz",
+		"chatImage": "Chatdagi rasm"
 	},
 	"complaints": {
 		"title": "Shikoyatlar",
@@ -359,7 +391,23 @@
 		"savedToast": "Saqlandi",
 		"createdToast": "Yaratildi",
 		"children": "{count} ta ichki",
-		"noDelete": "O'chirish o'rniga statusni \"Nofaol\" qiling."
+		"statusHint": "Vaqtincha yashirish uchun statusni \"Nofaol\" qiling.",
+		"uzCyrlHint": "Bo'sh qolsa lotinchadan avtomatik o'giriladi",
+		"unknownIcon": "Bu ikonka to'plamda yo'q — boshqasini tanlang",
+		"iconNone": "Ikonkasiz",
+		"iconSearch": "Ikonka qidirish",
+		"noIcons": "Ikonka topilmadi",
+		"media": "Rasm va ikonka",
+		"image": "Rasm",
+		"customIcon": "O'z ikonkasi",
+		"customIconHint": "Yuklangan ikonka to'plamdagidan ustun turadi. To'plamdan boshqa ikonka tanlab saqlasangiz, yuklangani o'chadi. O'zgarishlar darhol saqlanadi.",
+		"deletedToast": "O'chirildi",
+		"deleteCategoryTitle": "Kategoriyani o'chirish",
+		"deleteCategoryDescription": "\"{name}\" o'chiriladi (arxivlanadi) va ro'yxatdan yo'qoladi.",
+		"deleteCascadeTitle": "Kategoriya bo'sh emas",
+		"deleteCascadeHint": "Davom etsangiz, butun shox ichidagi xizmatlar bilan birga o'chadi.",
+		"deleteServiceTitle": "Xizmatni o'chirish",
+		"deleteServiceDescription": "\"{name}\" o'chiriladi. Ustalarning shu xizmatga narxlari ham o'chadi; eski buyurtmalar o'zgarmaydi."
 	},
 	"finance": {
 		"invoices": "Invoice'lar",
@@ -376,7 +424,7 @@
 		"overdue": "Muddati o'tgan",
 		"settle": "To'lovni qayd etish",
 		"settleTitle": "To'lovni qayd etish",
-		"settleHint": "Summa to'lanmagan qoldiqqa teng bo'lishi shart.",
+		"settleHint": "Summa hisobdagi qarzga teng bo'lishi shart (ortiqcha to'lov chegirilgan).",
 		"amount": "Summa",
 		"reference": "Ma'lumotnoma (chek raqami)",
 		"settledToast": "To'lov qayd etildi. Qoldiq: {balance}",
@@ -415,7 +463,8 @@
 		"orderStatus": "Buyurtma holati",
 		"orderCommission": "Buyurtma komissiyasi",
 		"reportedCommission": "Hisobotdagi",
-		"ledgerNet": "Ledger net"
+		"ledgerNet": "Ledger net",
+		"onHold": "Ushlab turilgan"
 	},
 	"system": {
 		"title": "Tizim",
@@ -429,6 +478,57 @@
 		"reindexDescription": "Barcha ustalar va xizmatlar qidiruv indeksiga qayta yoziladi. Jarayon bir necha daqiqa olishi va qidiruvni vaqtincha sekinlashtirishi mumkin.",
 		"reindexTitle": "Indeksni qayta qurishni tasdiqlang",
 		"reindexDoneToast": "Indeks qayta qurildi",
-		"result": "Natija"
+		"result": "Natija",
+		"outbox": "Yetkazilmagan eventlar",
+		"outboxDescription": "Urinishlari tugagan ichki eventlar (eng eskisidan).",
+		"outboxEmpty": "Hammasi yetkazilgan",
+		"outboxLimited": "Faqat birinchi {count} tasi ko'rsatilgan",
+		"eventType": "Event",
+		"aggregate": "Obyekt",
+		"attempts": "Urinishlar",
+		"lastError": "Oxirgi xato",
+		"createdAt": "Yaratilgan",
+		"retry": "Qayta navbatga qo'yish",
+		"retryTitle": "Eventlarni qayta yuborish",
+		"retryDescription": "Barcha yetkazilmagan eventlar qayta navbatga qo'yiladi. Avval xato sababi bartaraf etilganiga ishonch hosil qiling.",
+		"retriedToast": "{count} ta event qayta navbatga qo'yildi"
+	},
+	"upload": {
+		"upload": "Yuklash",
+		"replace": "Almashtirish",
+		"remove": "Olib tashlash",
+		"uploading": "Yuklanmoqda…",
+		"rules": "{types} · {max} gacha · {min}–{maxPx} px",
+		"invalidType": "Fayl turi ruxsat etilmagan. Ruxsat: {types}",
+		"tooLarge": "Fayl hajmi {max} dan oshmasligi kerak",
+		"dimensions": "Rasm tomonlari {min}–{max} px bo'lishi kerak",
+		"notSquare": "Ikonka kvadrat bo'lishi kerak",
+		"unreadable": "Rasmni o'qib bo'lmadi",
+		"uploadedToast": "Yuklandi",
+		"removedToast": "Olib tashlandi"
+	},
+	"admins": {
+		"title": "Adminlar",
+		"subtitle": "Administratorlar va ularning huquqlari",
+		"appoint": "Admin tayinlash",
+		"appointTitle": "Admin tayinlash",
+		"appointDescription": "Telefon raqam bo'yicha. Hisob bo'lmasa yaratiladi.",
+		"editTitle": "Huquqlarni o'zgartirish",
+		"phone": "Telefon",
+		"invalidPhone": "Format: +998 XX XXX XX XX",
+		"superAdmin": "Super admin",
+		"allPermissions": "Barcha huquqlar",
+		"permissions": "Huquqlar",
+		"permissionsRequired": "Kamida bitta huquq tanlang",
+		"status": "Status",
+		"lastLogin": "Oxirgi kirish",
+		"createdAt": "Qo'shilgan",
+		"tokenNote": "Huquqlar to'liq almashtiriladi va darhol kuchga kiradi: admin sessiyadan chiqmaydi, keyingi so'rovda yangi huquqlar bilan davom etadi.",
+		"appointedToast": "Admin tayinlandi",
+		"savedToast": "Huquqlar saqlandi",
+		"remove": "Adminlikdan olish",
+		"removeTitle": "Adminlikni olib tashlash",
+		"removeDescription": "{phone} admin panelga kira olmaydi. Mijoz/usta rollari saqlanadi.",
+		"removedToast": "Adminlik olib tashlandi"
 	}
 }

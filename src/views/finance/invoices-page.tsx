@@ -61,6 +61,10 @@ export function InvoicesPage() {
 			cell: c => <MoneyText value={c.getValue()} />,
 		}),
 		col.accessor('paid', { header: t('paid'), cell: c => <MoneyText value={c.getValue()} /> }),
+		col.accessor('onHold', {
+			header: t('onHold'),
+			cell: c => <MoneyText value={c.getValue()} className='text-muted-foreground' />,
+		}),
 		col.display({
 			id: 'debt',
 			header: t('debt'),

@@ -5,7 +5,9 @@ import { ChevronRightIcon, FolderIcon, PencilIcon, PlusIcon } from 'lucide-react
 import { useTranslations } from 'next-intl';
 import { useCategories } from '@/entities/catalog/api';
 import { buildCategoryTree, localized, type CategoryNode } from '@/entities/catalog/model';
+import { CatalogIcon } from '@/entities/catalog/ui';
 import { CategoryFormDialog } from '@/features/category-form/category-form-dialog';
+import { DeleteCatalogItemButton } from '@/features/delete-catalog-item/delete-catalog-item';
 import type { Category } from '@/shared/api/types';
 import { useLocale } from '@/shared/i18n/locale';
 import { cn } from '@/shared/lib/utils';
@@ -134,7 +136,7 @@ function TreeRow({
 					>
 						<ChevronRightIcon className={cn('size-4 transition-transform', open && 'rotate-90')} />
 					</button>
-					<FolderIcon className='size-4 shrink-0 text-muted-foreground' />
+					<CatalogIcon url={node.iconUrl} fallback={FolderIcon} />
 					<span className='truncate font-medium'>{localized(node.name, locale)}</span>
 					{hasChildren && (
 						<span className='text-xs text-subtle-foreground'>
@@ -160,6 +162,11 @@ function TreeRow({
 						>
 							<PencilIcon />
 						</Button>
+						<DeleteCatalogItemButton
+							kind='category'
+							id={node.id!}
+							name={localized(node.name, locale)}
+						/>
 					</span>
 				</div>
 				<span className='truncate num text-xs text-muted-foreground max-md:hidden'>

@@ -3,6 +3,7 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { cleanParams, http } from '@/shared/api/client';
 import type { AdminUser, Page, UserResponse, UserRole, UserStatus } from '@/shared/api/types';
+import { hasAccess, isSuperAdmin, type Access } from '@/shared/lib/access';
 
 export interface UsersParams {
 	phone?: string;
@@ -26,6 +27,16 @@ export function useMe() {
 	});
 }
 
+/** Current admin's permissions (plan §5.4). Everything is denied until /me loads. */
+export function useAccess() {
+	const { data } = useMe();
+	return {
+		me: data,
+		superAdmin: isSuperAdmin(data),
+		can: (...need: Access[]) => hasAccess(data, ...need),
+	};
+}
+
 export function useAdminUsers(p: UsersParams) {
 	return useQuery({
 		queryKey: userKeys.list(p),
@@ -38,4 +49,6 @@ export const userApi = {
 	block: (id: string, reason: string) =>
 		http.post<AdminUser>(`/admin/users/${id}/block`, { reason }),
 	unblock: (id: string) => http.post<AdminUser>(`/admin/users/${id}/unblock`),
+	/** Irreversible anonymisation (USERS + DELETE). */
+	remove: (id: string) => http.delete(`/admin/users/${id}`),
 };

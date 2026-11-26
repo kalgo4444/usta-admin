@@ -6,7 +6,8 @@ import { GavelIcon, MessagesSquareIcon, PackageIcon, TriangleAlertIcon } from 'l
 import { useTranslations } from 'next-intl';
 import { useAdminComplaint } from '@/entities/complaint/api';
 import { useAdminOrder } from '@/entities/order/api';
-import { useMe } from '@/entities/user/api';
+import { useAdmins } from '@/entities/admin/api';
+import { useAccess } from '@/entities/user/api';
 import { UserBlockActions } from '@/features/block-user/user-block-actions';
 import { ComplaintActions } from '@/features/complaint-actions/complaint-actions';
 import { routes, withQuery } from '@/shared/config/routes';
@@ -19,17 +20,21 @@ import { CopyId } from '@/shared/ui/copy-id';
 import { DetailSkeleton } from '@/shared/ui/detail-skeleton';
 import { ErrorState } from '@/shared/ui/error-state';
 import { InfoRow } from '@/shared/ui/page-header';
+import { PhoneText } from '@/shared/ui/phone-text';
 import { StatusBadge } from '@/shared/ui/status-badge';
+import { ChatViewer } from '@/widgets/order-detail/chat-viewer';
 
 export function ComplaintDetailPage() {
 	const { id } = useParams<{ id: string }>();
 	const t = useTranslations('complaints');
 	const tn = useTranslations('nav');
 	const to = useTranslations('orders');
-	const me = useMe();
+	const { me, can, superAdmin } = useAccess();
 	const q = useAdminComplaint(id);
 	const orderId = q.data?.complaint?.orderId;
-	const order = useAdminOrder(orderId);
+	// Order details need ORDERS; COMPLAINTS alone may still read the chat (below).
+	const order = useAdminOrder(can('ORDERS') ? orderId : undefined);
+	const admins = useAdmins(superAdmin);
 
 	if (q.error) {
 		return (
@@ -112,7 +117,7 @@ export function ComplaintDetailPage() {
 								<p className='text-sm whitespace-pre-line'>{c.resolutionNote}</p>
 							</div>
 						)}
-						{c.orderId && (
+						{c.orderId && can('ORDERS') && (
 							<div className='flex flex-wrap gap-2'>
 								<Button variant='secondary' size='sm' asChild>
 									<Link href={routes.order(c.orderId)}>
@@ -152,10 +157,13 @@ export function ComplaintDetailPage() {
 							</InfoRow>
 							<InfoRow label={t('assignedTo')}>
 								{data.assignedTo ? (
-									data.assignedTo === me.data?.id ? (
+									data.assignedTo === me?.id ? (
 										t('me')
 									) : (
-										<CopyId id={data.assignedTo} />
+										<AssignedAdmin
+											id={data.assignedTo}
+											phone={admins.data?.find(a => a.id === data.assignedTo)?.phone}
+										/>
 									)
 								) : (
 									'—'
@@ -179,7 +187,24 @@ export function ComplaintDetailPage() {
 						)}
 					</CardContent>
 				</Card>
+
+				{c.orderId && !can('ORDERS') && (
+					<Card className='lg:col-span-2'>
+						<CardHeader>
+							<CardTitle>{to('chat')}</CardTitle>
+						</CardHeader>
+						<CardContent>
+							<ChatViewer orderId={c.orderId} />
+						</CardContent>
+					</Card>
+				)}
 			</div>
 		</div>
 	);
+}
+
+/** Admin phone is only resolvable for a super admin (`/admin/admins`). */
+function AssignedAdmin({ id, phone }: { id: string; phone?: string }) {
+	if (!phone) return <CopyId id={id} />;
+	return <PhoneText phone={phone} />;
 }

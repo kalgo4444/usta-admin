@@ -8,7 +8,7 @@ import { useTranslations } from 'next-intl';
 import { Controller, useForm, useWatch } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
-import { catalogApi } from '@/entities/catalog/api';
+import { catalogApi, useCatalogIcons } from '@/entities/catalog/api';
 import {
 	buildCategoryTree,
 	flattenTree,
@@ -16,6 +16,8 @@ import {
 	SLUG_RE,
 	slugify,
 } from '@/entities/catalog/model';
+import { IconPicker } from '@/entities/catalog/ui';
+import { CatalogMedia } from '@/features/catalog-media/catalog-media';
 import { invalidate } from '@/shared/api/invalidate';
 import type { CatalogService, Category } from '@/shared/api/types';
 import { useMutationErrorHandler } from '@/shared/api/use-mutation-error';
@@ -43,8 +45,11 @@ import {
 } from '@/shared/ui/kit/dialog';
 import { Field } from '@/shared/ui/field';
 
-const LANGS = ['uz', 'ru', 'en'] as const;
+const LANGS = ['uz', 'uzCyrl', 'ru', 'en'] as const;
 type Lang = (typeof LANGS)[number];
+/** Name is required in these; uzCyrl is transliterated from uz when empty. */
+const REQUIRED: readonly Lang[] = ['uz', 'ru', 'en'];
+const LANG_LABEL: Record<Lang, string> = { uz: 'UZ', uzCyrl: 'ЎЗ', ru: 'RU', en: 'EN' };
 
 interface Props {
 	open: boolean;
@@ -85,12 +90,19 @@ function ServiceForm({
 	const onError = useMutationErrorHandler();
 	const [autoSlug, setAutoSlug] = useState(!service);
 	const [lang, setLang] = useState<Lang>('uz');
+	const [customIcon, setCustomIcon] = useState(Boolean(service?.customIcon));
+	const icons = useCatalogIcons();
+	const iconKeys = useMemo(() => new Set((icons.data ?? []).map(i => i.key)), [icons.data]);
 
 	const text = (max: number) => z.string().trim().max(max, te('maxLength', { max }));
+	const name = text(120)
+		.min(1, te('required'))
+		.min(2, te('minLength', { min: 2 }));
 	const schema = z.object({
 		categoryId: z.string().min(1, te('required')),
-		name: z.object({ uz: text(120).min(1, te('required')), ru: text(120), en: text(120) }),
-		description: z.object({ uz: text(2000), ru: text(2000), en: text(2000) }),
+		name: z.object({ uz: name, uzCyrl: text(120), ru: name, en: name }),
+		description: z.object({ uz: text(2000), uzCyrl: text(2000), ru: text(2000), en: text(2000) }),
+		icon: z.string().refine(k => !k || !icons.data || iconKeys.has(k), t('unknownIcon')),
 		slug: z
 			.string()
 			.trim()
@@ -109,12 +121,19 @@ function ServiceForm({
 
 	const defaults = (): Values => ({
 		categoryId: service?.categoryId ?? defaultCategoryId ?? '',
-		name: { uz: service?.name?.uz ?? '', ru: service?.name?.ru ?? '', en: service?.name?.en ?? '' },
+		name: {
+			uz: service?.name?.uz ?? '',
+			uzCyrl: service?.name?.uzCyrl ?? '',
+			ru: service?.name?.ru ?? '',
+			en: service?.name?.en ?? '',
+		},
 		description: {
 			uz: service?.description?.uz ?? '',
+			uzCyrl: service?.description?.uzCyrl ?? '',
 			ru: service?.description?.ru ?? '',
 			en: service?.description?.en ?? '',
 		},
+		icon: service?.icon ?? '',
 		slug: service?.slug ?? '',
 		sortOrder: service?.sortOrder ?? 0,
 		status: service?.status ?? 'ACTIVE',
@@ -133,12 +152,15 @@ function ServiceForm({
 			const body = {
 				categoryId: v.categoryId,
 				slug: v.slug,
-				name: { uz: v.name.uz, ru: opt(v.name.ru), en: opt(v.name.en) },
+				name: { uz: v.name.uz, uzCyrl: opt(v.name.uzCyrl), ru: v.name.ru, en: v.name.en },
 				description: {
 					uz: opt(v.description.uz),
+					uzCyrl: opt(v.description.uzCyrl),
 					ru: opt(v.description.ru),
 					en: opt(v.description.en),
 				},
+				// Sending a key replaces an uploaded icon, so keep it out unless it was changed.
+				icon: customIcon && v.icon === (service?.icon ?? '') ? undefined : opt(v.icon),
 				sortOrder: v.sortOrder,
 				status: v.status,
 			};
@@ -199,8 +221,8 @@ function ServiceForm({
 					<TabsList>
 						{LANGS.map(l => (
 							<TabsTrigger key={l} value={l} className={cn(langHasError(l) && 'text-destructive')}>
-								{l.toUpperCase()}
-								{l === 'uz' && <span className='text-destructive'>*</span>}
+								{LANG_LABEL[l]}
+								{REQUIRED.includes(l) && <span className='text-destructive'>*</span>}
 							</TabsTrigger>
 						))}
 					</TabsList>
@@ -208,9 +230,10 @@ function ServiceForm({
 				{LANGS.map(l => (
 					<div key={l} className={cn('space-y-4', l !== lang && 'hidden')}>
 						<Field
-							label={t('nameLang', { lang: l })}
+							label={t('nameLang', { lang: LANG_LABEL[l] })}
 							htmlFor={`s-name-${l}`}
-							required={l === 'uz'}
+							required={REQUIRED.includes(l)}
+							hint={l === 'uzCyrl' ? t('uzCyrlHint') : undefined}
 							error={err.name?.[l]?.message}
 						>
 							<Input
@@ -222,7 +245,7 @@ function ServiceForm({
 							/>
 						</Field>
 						<Field
-							label={t('descriptionLang', { lang: l })}
+							label={t('descriptionLang', { lang: LANG_LABEL[l] })}
 							htmlFor={`s-desc-${l}`}
 							counter={l === lang ? { value: desc, max: 2000 } : undefined}
 							error={err.description?.[l]?.message}
@@ -263,6 +286,15 @@ function ServiceForm({
 					</Button>
 				</div>
 			</Field>
+			<Field label={t('icon')} className='sm:col-span-2' error={err.icon?.message}>
+				<Controller
+					control={form.control}
+					name='icon'
+					render={({ field }) => (
+						<IconPicker value={field.value} onChange={field.onChange} invalid={Boolean(err.icon)} />
+					)}
+				/>
+			</Field>
 			<Field label={t('sortOrder')} htmlFor='s-sort' error={err.sortOrder?.message}>
 				<Input
 					id='s-sort'
@@ -293,6 +325,15 @@ function ServiceForm({
 					)}
 				/>
 			</Field>
+			{service?.id && (
+				<div className='sm:col-span-2'>
+					<CatalogMedia
+						kind='services'
+						item={service}
+						onChange={c => setCustomIcon(Boolean(c.customIcon))}
+					/>
+				</div>
+			)}
 			<DialogFooter className='sm:col-span-2'>
 				<Button type='button' variant='secondary' onClick={() => onOpenChange(false)}>
 					{tc('cancel')}

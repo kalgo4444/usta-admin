@@ -66,6 +66,9 @@ export function useOrderChat(orderId: string) {
 			const oldest = last.reduce((a, b) => ((b.createdAt ?? '') < (a.createdAt ?? '') ? b : a));
 			return oldest.id;
 		},
+		// image messages carry presigned URLs (15 min)
+		staleTime: 0,
+		gcTime: 0,
 	});
 }
 

@@ -20,8 +20,18 @@ const TONES: Record<string, Record<string, BadgeTone>> = {
 		APPROVED: 'green',
 		REJECTED: 'red',
 	},
-	UserStatus: { ACTIVE: 'green', BLOCKED: 'red' },
-	UserRole: { CUSTOMER: 'neutral', MASTER: 'blue', ADMIN: 'outline' },
+	UserStatus: { ACTIVE: 'green', BLOCKED: 'red', DELETED: 'gray' },
+	UserRole: { CUSTOMER: 'neutral', MASTER: 'blue', ADMIN: 'outline', SUPER_ADMIN: 'amber' },
+	AdminPermission: {
+		USERS: 'neutral',
+		MASTERS: 'neutral',
+		CATALOG: 'neutral',
+		ORDERS: 'neutral',
+		FINANCE: 'neutral',
+		COMPLAINTS: 'neutral',
+		SYSTEM: 'neutral',
+		DELETE: 'red',
+	},
 	ComplaintStatus: { OPEN: 'blue', IN_REVIEW: 'amber', RESOLVED: 'green', REJECTED: 'gray' },
 	ComplaintReason: {
 		QUALITY: 'neutral',
@@ -53,6 +63,7 @@ export type EnumName =
 	| 'VerificationStatus'
 	| 'UserStatus'
 	| 'UserRole'
+	| 'AdminPermission'
 	| 'ComplaintStatus'
 	| 'ComplaintReason'
 	| 'OfferStatus'

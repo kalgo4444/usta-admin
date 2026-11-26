@@ -78,4 +78,5 @@ export const financeApi = {
 };
 
 /** Unpaid remainder of an invoice. */
-export const invoiceDebt = (i: Invoice) => Math.max(0, (i.invoiced ?? 0) - (i.paid ?? 0));
+/** What the master still owes for the week: backend `due` (overpayments already netted). */
+export const invoiceDebt = (i: Invoice) => i.due ?? Math.max(0, (i.invoiced ?? 0) - (i.paid ?? 0));

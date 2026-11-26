@@ -48,7 +48,7 @@ export function ResolveDisputeDialog({ order }: { order: Order }) {
 				.max(500, te('maxLength', { max: 500 })),
 			price: z
 				.number({ error: te('invalidNumber') })
-				.min(0)
+				.min(1, te('minValue', { min: 1 }))
 				.max(MAX_PRICE)
 				.optional(),
 		})
@@ -137,7 +137,7 @@ export function ResolveDisputeDialog({ order }: { order: Order }) {
 										id='price'
 										type='number'
 										inputMode='decimal'
-										min={0}
+										min={1}
 										step='any'
 										className='num'
 										placeholder={hasPrice ? String(order.price) : undefined}
