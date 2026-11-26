@@ -1,28 +1,25 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useQueryClient } from '@tanstack/react-query';
-import { WandSparklesIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Controller, useForm, useWatch } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
-import { catalogApi, useCatalogIcons } from '@/entities/catalog/api';
 import {
+	catalogApi,
 	buildCategoryTree,
 	flattenTree,
+	iconForSave,
 	localized,
-	SLUG_RE,
 	slugify,
-} from '@/entities/catalog/model';
-import { IconPicker } from '@/entities/catalog/ui';
-import { CatalogMedia } from '@/features/catalog-media/catalog-media';
+	IconPicker,
+} from '@/entities/catalog';
 import { invalidate } from '@/shared/api/invalidate';
 import type { CatalogService, Category } from '@/shared/api/types';
 import { useMutationErrorHandler } from '@/shared/api/use-mutation-error';
 import { useLocale } from '@/shared/i18n/locale';
-import { useEnumLabel } from '@/shared/i18n/use-enum';
 import { bindFieldErrors, toOptionalNumber } from '@/shared/lib/form';
 import { cn } from '@/shared/lib/utils';
 import { Button } from '@/shared/ui/kit/button';
@@ -44,6 +41,9 @@ import {
 	DialogTitle,
 } from '@/shared/ui/kit/dialog';
 import { Field } from '@/shared/ui/field';
+import { CatalogMedia } from './catalog-media';
+import { SlugField, StatusSelect } from './fields';
+import { catalogCommonFields, useCatalogSchemaMessages, useIconKeys } from './schema';
 
 const LANGS = ['uz', 'uzCyrl', 'ru', 'en'] as const;
 type Lang = (typeof LANGS)[number];
@@ -84,15 +84,14 @@ function ServiceForm({
 	const t = useTranslations('catalog');
 	const tc = useTranslations('common');
 	const te = useTranslations('errors');
-	const enumLabel = useEnumLabel();
+	const messages = useCatalogSchemaMessages();
 	const locale = useLocale();
 	const qc = useQueryClient();
 	const onError = useMutationErrorHandler();
 	const [autoSlug, setAutoSlug] = useState(!service);
 	const [lang, setLang] = useState<Lang>('uz');
 	const [customIcon, setCustomIcon] = useState(Boolean(service?.customIcon));
-	const icons = useCatalogIcons();
-	const iconKeys = useMemo(() => new Set((icons.data ?? []).map(i => i.key)), [icons.data]);
+	const iconKeys = useIconKeys();
 
 	const text = (max: number) => z.string().trim().max(max, te('maxLength', { max }));
 	const name = text(120)
@@ -102,20 +101,7 @@ function ServiceForm({
 		categoryId: z.string().min(1, te('required')),
 		name: z.object({ uz: name, uzCyrl: text(120), ru: name, en: name }),
 		description: z.object({ uz: text(2000), uzCyrl: text(2000), ru: text(2000), en: text(2000) }),
-		icon: z.string().refine(k => !k || !icons.data || iconKeys.has(k), t('unknownIcon')),
-		slug: z
-			.string()
-			.trim()
-			.min(1, te('required'))
-			.max(80, te('maxLength', { max: 80 }))
-			.regex(SLUG_RE, t('slugInvalid')),
-		sortOrder: z
-			.number({ error: te('invalidNumber') })
-			.int()
-			.min(0)
-			.max(100000)
-			.optional(),
-		status: z.enum(['ACTIVE', 'INACTIVE']),
+		...catalogCommonFields(messages, iconKeys),
 	});
 	type Values = z.infer<typeof schema>;
 
@@ -141,7 +127,7 @@ function ServiceForm({
 
 	const form = useForm<Values>({ resolver: zodResolver(schema), defaultValues: defaults() });
 
-	const options = useMemo(() => flattenTree(buildCategoryTree(categories)), [categories]);
+	const options = flattenTree(buildCategoryTree(categories));
 	const err = form.formState.errors;
 	const desc = useWatch({ control: form.control, name: `description.${lang}` });
 	const langHasError = (l: Lang) => Boolean(err.name?.[l] || err.description?.[l]);
@@ -159,8 +145,7 @@ function ServiceForm({
 					ru: opt(v.description.ru),
 					en: opt(v.description.en),
 				},
-				// Sending a key replaces an uploaded icon, so keep it out unless it was changed.
-				icon: customIcon && v.icon === (service?.icon ?? '') ? undefined : opt(v.icon),
+				icon: iconForSave(v.icon, service?.icon, customIcon),
 				sortOrder: v.sortOrder,
 				status: v.status,
 			};
@@ -256,36 +241,15 @@ function ServiceForm({
 				))}
 			</div>
 
-			<Field
-				label={t('slug')}
-				htmlFor='s-slug'
-				required
+			<SlugField
+				id='s-slug'
+				registration={form.register('slug', { onChange: () => setAutoSlug(false) })}
+				onGenerate={() => {
+					setAutoSlug(true);
+					form.setValue('slug', slugify(form.getValues('name.uz')), { shouldValidate: true });
+				}}
 				error={err.slug?.message}
-				hint={t('slugHint')}
-				className='sm:col-span-2'
-			>
-				<div className='flex gap-2'>
-					<Input
-						id='s-slug'
-						className='num'
-						{...form.register('slug', { onChange: () => setAutoSlug(false) })}
-					/>
-					<Button
-						type='button'
-						variant='secondary'
-						size='icon'
-						className='size-12'
-						aria-label={t('generate')}
-						title={t('generate')}
-						onClick={() => {
-							setAutoSlug(true);
-							form.setValue('slug', slugify(form.getValues('name.uz')), { shouldValidate: true });
-						}}
-					>
-						<WandSparklesIcon />
-					</Button>
-				</div>
-			</Field>
+			/>
 			<Field label={t('icon')} className='sm:col-span-2' error={err.icon?.message}>
 				<Controller
 					control={form.control}
@@ -309,20 +273,7 @@ function ServiceForm({
 				<Controller
 					control={form.control}
 					name='status'
-					render={({ field }) => (
-						<Select value={field.value} onValueChange={field.onChange}>
-							<SelectTrigger>
-								<SelectValue />
-							</SelectTrigger>
-							<SelectContent>
-								{(['ACTIVE', 'INACTIVE'] as const).map(s => (
-									<SelectItem key={s} value={s}>
-										{enumLabel('CatalogStatus', s)}
-									</SelectItem>
-								))}
-							</SelectContent>
-						</Select>
-					)}
+					render={({ field }) => <StatusSelect value={field.value} onChange={field.onChange} />}
 				/>
 			</Field>
 			{service?.id && (

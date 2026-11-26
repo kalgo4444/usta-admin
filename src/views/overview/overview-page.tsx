@@ -1,11 +1,14 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { useAccess } from '@/entities/user/api';
+import { useAccess } from '@/entities/user';
 import { PageHeader } from '@/shared/ui/page-header';
-import { KpiCards } from '@/widgets/overview/kpi-cards';
-import { ReconciliationWidget } from '@/widgets/overview/reconciliation-widget';
-import { RecentComplaints, RecentDisputes } from '@/widgets/overview/recent-activity';
+import {
+	KpiCards,
+	ReconciliationWidget,
+	RecentComplaints,
+	RecentDisputes,
+} from '@/widgets/overview';
 
 export function OverviewPage() {
 	const t = useTranslations('overview');

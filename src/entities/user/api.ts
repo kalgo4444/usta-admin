@@ -5,7 +5,7 @@ import { cleanParams, http } from '@/shared/api/client';
 import type { AdminUser, Page, UserResponse, UserRole, UserStatus } from '@/shared/api/types';
 import { hasAccess, isSuperAdmin, type Access } from '@/shared/lib/access';
 
-export interface UsersParams {
+interface UsersParams {
 	phone?: string;
 	role?: UserRole;
 	status?: UserStatus;

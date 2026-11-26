@@ -69,3 +69,17 @@ test('deleting a non-empty category asks again and cascades', async ({ context, 
 	await expect(page.getByText("O'chirildi")).toBeVisible();
 	expect(deletes).toEqual(['', '?cascade=true']);
 });
+
+test('the category form opens, closes and opens again', async ({ context, page }) => {
+	await mockAdminSession(context, page);
+	await page.goto('/catalog/categories');
+
+	await page.getByRole('button', { name: 'Yangi kategoriya' }).click();
+	const dialog = page.getByRole('dialog');
+	await expect(dialog.getByRole('heading', { name: 'Yangi kategoriya' })).toBeVisible();
+	await dialog.getByRole('button', { name: 'Bekor qilish' }).click();
+	await expect(dialog).toBeHidden();
+
+	await page.getByRole('button', { name: 'Yangi kategoriya' }).click();
+	await expect(dialog.getByRole('heading', { name: 'Yangi kategoriya' })).toBeVisible();
+});

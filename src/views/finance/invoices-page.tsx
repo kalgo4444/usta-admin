@@ -4,14 +4,15 @@ import { useState } from 'react';
 import Link from 'next/link';
 import dayjs from 'dayjs';
 import { useTranslations } from 'next-intl';
-import { invoiceDebt, useInvoices } from '@/entities/finance/api';
-import { CloseWeeksButton } from '@/features/close-weeks/close-weeks-button';
-import { MasterPicker, useMasterNames } from '@/features/select-master/master-picker';
-import { SettleInvoiceDialog } from '@/features/settle-invoice/settle-invoice-dialog';
+import dynamic from 'next/dynamic';
+import { invoiceDebt, useInvoices } from '@/entities/finance';
+import { CloseWeeksButton } from '@/features/close-weeks';
+import { MasterPicker, useMasterNames } from '@/features/select-master';
 import type { Invoice } from '@/shared/api/types';
 import { routes } from '@/shared/config/routes';
 import { formatDate, shortId } from '@/shared/lib/format';
 import { useTableParams } from '@/shared/lib/use-table-params';
+import { useOpenedOnce } from '@/shared/lib/use-opened-once';
 import { Badge } from '@/shared/ui/kit/badge';
 import { Button } from '@/shared/ui/kit/button';
 import { columnHelper, DataTable } from '@/shared/ui/data-table';
@@ -19,6 +20,11 @@ import { WeekPicker } from '@/shared/ui/date-inputs';
 import { FilterBar } from '@/shared/ui/filter-bar';
 import { MoneyText } from '@/shared/ui/money-text';
 import { PageHeader } from '@/shared/ui/page-header';
+
+/** Loaded on first open: keeps zod + react-hook-form out of the page's initial JS. */
+const SettleInvoiceDialog = dynamic(() =>
+	import('@/features/settle-invoice').then(m => m.SettleInvoiceDialog),
+);
 
 const col = columnHelper<Invoice>();
 const isOverdue = (i: Invoice) =>
@@ -30,6 +36,7 @@ export function InvoicesPage() {
 	const q = useInvoices({ period: tp.apiFilters.period, masterId: tp.apiFilters.masterId });
 	const names = useMasterNames();
 	const [settling, setSettling] = useState<Invoice | null>(null);
+	const dialogMounted = useOpenedOnce(settling !== null);
 	const nameOf = (id?: string) => (id ? (names.get(id) ?? shortId(id)) : '—');
 
 	const columns = [
@@ -125,12 +132,14 @@ export function InvoicesPage() {
 					isOverdue(r) ? 'bg-destructive/[0.04] [&_td]:text-destructive' : undefined
 				}
 			/>
-			<SettleInvoiceDialog
-				invoice={settling}
-				masterLabel={nameOf(settling?.masterId)}
-				open={settling !== null}
-				onOpenChange={o => !o && setSettling(null)}
-			/>
+			{dialogMounted && (
+				<SettleInvoiceDialog
+					invoice={settling}
+					masterLabel={nameOf(settling?.masterId)}
+					open={settling !== null}
+					onOpenChange={o => !o && setSettling(null)}
+				/>
+			)}
 		</div>
 	);
 }

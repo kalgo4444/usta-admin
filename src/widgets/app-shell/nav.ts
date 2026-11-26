@@ -42,7 +42,7 @@ export interface NavItem {
 	badge?: 'pendingMasters' | 'disputes' | 'openComplaints';
 }
 
-export interface NavGroup {
+interface NavGroup {
 	key?: 'catalog' | 'finance';
 	items: NavItem[];
 }

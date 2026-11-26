@@ -17,7 +17,7 @@ export const catalogKeys = {
 };
 
 export type CatalogKind = 'categories' | 'services';
-export type MediaSlot = 'image' | 'icon';
+type MediaSlot = 'image' | 'icon';
 
 export function useCategories() {
 	return useQuery({

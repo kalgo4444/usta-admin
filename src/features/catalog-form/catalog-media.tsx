@@ -5,12 +5,12 @@ import { useQueryClient } from '@tanstack/react-query';
 import { ImageIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
-import { catalogApi, type CatalogKind } from '@/entities/catalog/api';
-import { CatalogIcon } from '@/entities/catalog/ui';
+import { catalogApi, type CatalogKind, CatalogIcon } from '@/entities/catalog';
 import { invalidate } from '@/shared/api/invalidate';
 import type { CatalogService, Category } from '@/shared/api/types';
 import { useMutationErrorHandler } from '@/shared/api/use-mutation-error';
 import { ImageUpload, type ImageRules } from '@/shared/ui/image-upload';
+import { RemoteImage } from '@/shared/ui/remote-image';
 
 const IMAGE_RULES: ImageRules = {
 	types: ['image/jpeg', 'image/png', 'image/webp'],
@@ -76,8 +76,7 @@ export function CatalogMedia({
 				rules={IMAGE_RULES}
 				preview={
 					current.imageUrl ? (
-						// eslint-disable-next-line @next/next/no-img-element -- presigned URL
-						<img src={current.imageUrl} alt='' className='size-full object-cover' />
+						<RemoteImage eager src={current.imageUrl} alt='' className='size-full object-cover' />
 					) : (
 						<ImageIcon className='size-5 text-muted-foreground' />
 					)

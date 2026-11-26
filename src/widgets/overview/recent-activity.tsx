@@ -2,8 +2,8 @@
 
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
-import { useAdminComplaints } from '@/entities/complaint/api';
-import { useAdminOrders } from '@/entities/order/api';
+import { useAdminComplaints } from '@/entities/complaint';
+import { useAdminOrders } from '@/entities/order';
 import { routes, withQuery } from '@/shared/config/routes';
 import { formatDate } from '@/shared/lib/format';
 import { useEnumLabel } from '@/shared/i18n/use-enum';

@@ -1,24 +1,19 @@
 {
 	"common": {
-		"appName": "Usta Admin",
 		"save": "Saqlash",
 		"cancel": "Bekor qilish",
 		"confirm": "Tasdiqlash",
 		"close": "Yopish",
 		"retry": "Qayta urinish",
-		"search": "Qidirish",
 		"all": "Hammasi",
 		"actions": "Amallar",
 		"loading": "Yuklanmoqda…",
-		"back": "Orqaga",
 		"edit": "Tahrirlash",
 		"create": "Yaratish",
 		"yes": "Ha",
 		"no": "Yo'q",
 		"noData": "Ma'lumot yo'q",
-		"copy": "Nusxalash",
 		"copied": "Nusxalandi",
-		"open": "Ochish",
 		"reason": "Sabab",
 		"note": "Izoh",
 		"optional": "ixtiyoriy",
@@ -28,7 +23,6 @@
 		"prev": "Oldingi",
 		"next": "Keyingi",
 		"perPage": "Sahifada",
-		"reset": "Tozalash",
 		"refresh": "Yangilash",
 		"logout": "Chiqish",
 		"language": "Til",
@@ -37,7 +31,6 @@
 		"dark": "Qorong'i",
 		"system": "Tizim",
 		"menu": "Menyu",
-		"filterActive": "Filtr: {label}",
 		"removeFilter": "Filtrni olib tashlash",
 		"typeToConfirm": "Tasdiqlash uchun \"{word}\" deb yozing",
 		"km": "{value} km",
@@ -178,13 +171,6 @@
 		"notAdmin": "Ruxsat yo'q: bu raqam administrator emas.",
 		"blocked": "Hisob bloklangan.",
 		"invalidPhone": "Raqamni to'liq kiriting",
-		"countries": {
-			"uz": "Oʻzbekiston",
-			"kz": "Qozogʻiston",
-			"kg": "Qirgʻiziston",
-			"tj": "Tojikiston",
-			"tm": "Turkmaniston"
-		},
 		"checking": "Sessiya tekshirilmoqda…"
 	},
 	"overview": {
@@ -273,7 +259,6 @@
 		"rejectTitle": "Ustani rad etish",
 		"rejectDescription": "Sabab ustaga ko'rsatiladi. U hujjatlarni qayta yuklab yuborishi mumkin.",
 		"rejectedToast": "Usta rad etildi",
-		"presets": "Tayyor sabablar",
 		"preset": {
 			"passport": "Pasport rasmi aniq emas",
 			"selfie": "Selfi pasportdagi shaxsga mos kelmaydi",
@@ -412,7 +397,6 @@
 	"finance": {
 		"invoices": "Invoice'lar",
 		"period": "Hafta",
-		"periodHint": "Dushanba sanasi",
 		"master": "Usta",
 		"allMasters": "Barcha ustalar",
 		"orders": "Buyurtmalar",
@@ -451,7 +435,6 @@
 		"reconciliation": "Solishtirish",
 		"from": "Dan",
 		"to": "Gacha (kirmaydi)",
-		"run": "Tekshirish",
 		"ok": "Hammasi mos",
 		"notOk": "Nomuvofiqliklar topildi",
 		"ordersCount": "Buyurtmalar",

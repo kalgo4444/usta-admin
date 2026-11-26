@@ -1,7 +1,7 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { useAdminComplaints } from '@/entities/complaint/api';
+import { useAdminComplaints } from '@/entities/complaint';
 import type { ComplaintStatus } from '@/shared/api/types';
 import { ENUMS } from '@/shared/api/types';
 import { useEnumLabel } from '@/shared/i18n/use-enum';
@@ -10,7 +10,7 @@ import { ALL, useTableParams } from '@/shared/lib/use-table-params';
 import { Tabs, TabsList, TabsTrigger } from '@/shared/ui/kit/tabs';
 import { FilterBar, FilterChip } from '@/shared/ui/filter-bar';
 import { PageHeader } from '@/shared/ui/page-header';
-import { ComplaintsTable } from '@/widgets/complaint-list/complaints-table';
+import { ComplaintsTable } from '@/widgets/complaint-list';
 
 export function ComplaintsPage() {
 	const t = useTranslations('complaints');

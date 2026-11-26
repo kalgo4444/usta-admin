@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { CircleCheckIcon, CircleAlertIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useReconciliation } from '@/entities/finance/api';
+import { useReconciliation } from '@/entities/finance';
 import { routes } from '@/shared/config/routes';
 import { formatDate } from '@/shared/lib/format';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/kit/card';

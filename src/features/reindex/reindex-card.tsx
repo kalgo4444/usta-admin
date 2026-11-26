@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { DatabaseZapIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
-import { systemApi } from '@/entities/system/api';
+import { systemApi } from '@/entities/system';
 import { useMutationErrorHandler } from '@/shared/api/use-mutation-error';
 import { Button } from '@/shared/ui/kit/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/ui/kit/card';

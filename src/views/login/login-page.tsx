@@ -1,9 +1,9 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { LoginForm } from '@/features/auth-otp/login-form';
-import { PreferencesMenu } from '@/features/preferences/preferences-menu';
-import { ServerWakingBanner } from '@/widgets/app-shell/server-waking-banner';
+import { LoginForm } from '@/features/auth-otp';
+import { PreferencesMenu } from '@/features/preferences';
+import { ServerWakingBanner } from '@/widgets/app-shell';
 
 export function LoginPage() {
 	const t = useTranslations('auth');

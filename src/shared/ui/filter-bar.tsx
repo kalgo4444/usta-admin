@@ -1,9 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { SearchIcon, XIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useDebouncedValue } from '@/shared/lib/use-debounce';
 import { ALL } from '@/shared/lib/use-table-params';
 import { cn } from '@/shared/lib/utils';
 import {
@@ -38,12 +37,24 @@ export function SearchInput({
 	className?: string;
 }) {
 	const [text, setText] = useState(value ?? '');
-	const debounced = useDebouncedValue(text, 400);
-
+	const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
+	useEffect(() => () => clearTimeout(timer.current), []);
+	// The timer fires renders later: read the latest props, or a filter changed meanwhile
+	// would be overwritten by a commit built from stale URL params.
+	const latest = useRef({ value, onCommit });
 	useEffect(() => {
-		if ((debounced || undefined) !== (value || undefined)) onCommit(debounced || undefined);
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [debounced]);
+		latest.current = { value, onCommit };
+	});
+
+	// Debounced from the event, not from an effect on the typed text.
+	const change = (next: string) => {
+		setText(next);
+		clearTimeout(timer.current);
+		timer.current = setTimeout(() => {
+			const { value: current, onCommit: commit } = latest.current;
+			if ((next || undefined) !== (current || undefined)) commit(next || undefined);
+		}, 400);
+	};
 
 	return (
 		<label
@@ -55,14 +66,14 @@ export function SearchInput({
 			<SearchIcon className='size-4 text-muted-foreground' />
 			<input
 				value={text}
-				onChange={e => setText(e.target.value)}
+				onChange={e => change(e.target.value)}
 				placeholder={placeholder}
 				className='min-w-0 flex-1 bg-transparent outline-none placeholder:text-subtle-foreground'
 			/>
 			{text && (
 				<button
 					type='button'
-					onClick={() => setText('')}
+					onClick={() => change('')}
 					className='text-muted-foreground hover:text-foreground'
 				>
 					<XIcon className='size-4' />

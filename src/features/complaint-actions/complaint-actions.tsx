@@ -8,7 +8,7 @@ import { useTranslations } from 'next-intl';
 import { Controller, useForm, useWatch } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
-import { complaintApi } from '@/entities/complaint/api';
+import { complaintApi } from '@/entities/complaint';
 import { invalidate } from '@/shared/api/invalidate';
 import type { AdminComplaint } from '@/shared/api/types';
 import { useMutationErrorHandler } from '@/shared/api/use-mutation-error';

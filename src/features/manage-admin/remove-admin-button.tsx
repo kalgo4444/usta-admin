@@ -5,7 +5,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { UserMinusIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
-import { adminApi, adminKeys } from '@/entities/admin/api';
+import { adminApi, adminKeys } from '@/entities/admin';
 import { invalidate } from '@/shared/api/invalidate';
 import type { AdminAccount } from '@/shared/api/types';
 import { useMutationErrorHandler } from '@/shared/api/use-mutation-error';

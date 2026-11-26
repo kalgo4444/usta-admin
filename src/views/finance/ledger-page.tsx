@@ -3,8 +3,8 @@
 import Link from 'next/link';
 import { WalletIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useTransactions } from '@/entities/finance/api';
-import { MasterPicker } from '@/features/select-master/master-picker';
+import { useTransactions } from '@/entities/finance';
+import { MasterPicker } from '@/features/select-master';
 import type { Transaction } from '@/shared/api/types';
 import { routes } from '@/shared/config/routes';
 import { formatDate } from '@/shared/lib/format';

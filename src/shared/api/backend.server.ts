@@ -9,7 +9,7 @@ import type { TokenResponse } from './types';
 const TIMEOUT_MS = 65_000;
 
 /** JSON bodies are small; anything bigger is rejected before buffering. */
-export const MAX_BODY_BYTES = 1024 * 1024;
+const MAX_BODY_BYTES = 1024 * 1024;
 /** Catalog images are ≤ 5 MB; leave room for the multipart envelope. */
 export const MAX_UPLOAD_BYTES = 6 * 1024 * 1024;
 

@@ -1,7 +1,10 @@
 {
 	"name": "usta-admin",
-	"version": "0.1.0",
+	"version": "1.2.0",
 	"private": true,
+	"sideEffects": [
+		"*.css"
+	],
 	"scripts": {
 		"dev": "node scripts/next.mjs dev",
 		"build": "next build",

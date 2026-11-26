@@ -4,6 +4,7 @@ import { FileIcon, PlayIcon } from 'lucide-react';
 import type { Attachment } from '@/shared/api/types';
 import { formatBytes } from '@/shared/lib/format';
 import { ExternalLink } from '@/shared/ui/external-link';
+import { RemoteImage } from '@/shared/ui/remote-image';
 
 export function Attachments({ items }: { items: Attachment[] }) {
 	return (
@@ -19,8 +20,7 @@ export function Attachments({ items }: { items: Attachment[] }) {
 						className='group relative aspect-square overflow-hidden rounded-lg border border-border bg-muted'
 					>
 						{image ? (
-							// eslint-disable-next-line @next/next/no-img-element -- presigned URL
-							<img src={a.url} alt='' className='size-full object-cover' />
+							<RemoteImage src={a.url} alt='' className='size-full object-cover' />
 						) : video ? (
 							<>
 								<video src={a.url} preload='metadata' muted className='size-full object-cover' />

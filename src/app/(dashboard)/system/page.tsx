@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import { PageFallback } from '@/shared/ui/page-fallback';
-import { SystemPage } from '@/views/system/system-page';
+import { SystemPage } from '@/views/system';
 
 export const metadata: Metadata = { title: 'System' };
 
